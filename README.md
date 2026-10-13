@@ -44,6 +44,7 @@ Campos:
 - `id_proveedor` (FK)
 - `codigo_barras` (UNIQUE)
 - `nombre`
+- `imgen`
 - `tipo_unidad`
 - `precio_compra`
 - `precio_venta`
