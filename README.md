@@ -1,171 +1,117 @@
-# Sistema de gestión para Minisúper Variété
+# Sistema de Gestión para Minisúper Variété
 
 ## Descripción del negocio
 
-El sistema está pensado para un minisúper dedicado a la venta de productos de consumo diario, como alimentos, bebidas, productos de limpieza y artículos para el hogar.
+El sistema está diseñado para la administración integral de un minisúper dedicado a la venta de productos de consumo diario (alimentos, bebidas, artículos de limpieza y hogar).
 
-El sistema permitirá administrar los productos disponibles, organizarlos por categorías, registrar proveedores y clientes, controlar el stock y gestionar las compras y ventas realizadas en el negocio.
+Permite administrar el catálogo de productos por categorías, gestionar proveedores y clientes, controlar el inventario en tiempo real y registrar tanto el proceso de ventas en caja como el abastecimiento mediante compras.
 
-## Entidades y campos tentativos
+---
+
+## Entidades y Campos
 
 ### 1. `categorias`
-
-Permite organizar los productos según su tipo.
-
-Campos:
-- `id` (PK)
-- `nombre`
-- `descripcion`
-
-Ejemplos: Lácteos, Bebidas, Limpieza, Snacks, Abarrotes.
+Organiza los productos según su tipo dentro de la tienda.
+* `id automatico` (`INT`)
+* `nombre` (PK, `VARCHAR(50)`)
 
 ### 2. `proveedores`
-
-Almacena la información de las personas o empresas que suministran productos al minisúper.
-
-Campos:
-- `id` (PK)
-- `nit`
-- `nombre`
-- `telefono`
-- `direccion`
-- `email`
-- `activo`
-
-El campo `activo` permitirá deshabilitar un proveedor sin eliminar su información histórica.
+Almacena la información de las personas o empresas suministradoras.
+* `id automatico` (`INT`)
+* `nit_ci` (PK, `VARCHAR(20)`)
+* `nombres` (`VARCHAR(50)`)
+* `apellidos` (`VARCHAR(50)`)
+* `telefono` (`VARCHAR(20)`)
+* `direccion` (`VARCHAR(50)`)
+* `email` (`VARCHAR(50)`)
 
 ### 3. `productos`
+Almacena los artículos disponibles para la venta y su nivel de existencias.
+* `id automatico` (`INT`)
+* `codigo` (PK, `VARCHAR(20)`)
+* `id_categoria` (FK)
+* `id_proveedor` (FK)
+* `nombre` (`VARCHAR(50)`)
+* `imagen` (`VARCHAR(200)`)
+* `unidaMedida` (`VARCHAR`)
+* `precio` (`DECIMAL`)
+* `estado` (`VARCHAR`)
 
-Almacena los productos disponibles para la venta, sus precios y la cantidad existente en el negocio.
+### 4. `cliente`
+Almacena la información de los compradores registrados para la emisión de notas/facturas.
+* `id automatico` (`INT`)
+* `ci_nit` (PK, `VARCHAR(20)`)
+* `nombres` (`VARCHAR(50)`)
+* `apellidos` (`VARCHAR(50)`)
 
-Campos:
-- `id` (PK)
-- `id_categoria` (FK)
-- `id_proveedor` (FK)
-- `codigo_barras` (UNIQUE)
-- `nombre`
-- `imgen`
-- `tipo_unidad`
-- `precio_compra`
-- `precio_venta`
-- `stock_actual`
-- `stock_minimo`
-- `activo`
+### 5. `trabajadores`
+Almacena al personal operativo del minisúper (cajeros, administradores).
+* `id automatico` (`INT`)
+* `ci` (PK, `VARCHAR(20)`)
+* `nombres` (`VARCHAR(50)`)
+* `apellidos` (`VARCHAR(50)`)
+* `telefono` (`VARCHAR(10)`)
+* `direccion` (`VARCHAR(50)`)
 
-El campo `activo` permitirá dejar de ofrecer un producto sin eliminarlo de la base de datos.
+### 6. `usuario`
+Almacena las credenciales de acceso vinculadas al personal del minisúper.
+* `id automatico` (`INT`)
+* `usuario` (PK, `VARCHAR(60)`)
+* `ci_Trabajador` (FK)
+* `contraseña` (`VARCHAR`)
 
-Ejemplos de `tipo_unidad`: Unidad, Kilogramo, Litro, Bolsa.
+### 7. `ventas`
+Representa la cabecera de la transacción de venta realizada en caja.
+* `id automatico` (`INT`)
+* `numero_Venta` (PK)
+* `id_trabajador` (FK)
+* `id_cliente` (FK)
+* `descuento` (`DECIMAL`)
+* `sub_total` (`DECIMAL`)
+* `metodo de pago` (`VARCHAR`)
+* `toral` (`DECIMAL`)
 
-### 4. `clientes`
+### 8. `venta_detalles`
+Almacena los productos específicos incluidos en el ticket de venta.
+* `id automatico` (PK)
+* `id_venta` (FK)
+* `id_productos` (FK)
+* `fecha` (`TIMESTAMP`)
+* `cantidad` (`INT`)
+* `precio_unitario` (`DECIMAL`)
+* `sub_total` (`DECIMAL`)
 
-Almacena la información básica de los clientes, principalmente para identificar las ventas que requieran datos del comprador.
+### 9. `compras`
+Representa la cabecera del registro de abastecimiento a proveedores.
+* `id automatico` (`INT`)
+* `numero_Compra` (PK)
+* `nit_proveedor` (FK)
+* `id_trabajador` (FK)
+* `sub_total` (`DECIMAL`)
+* `total` (`DECIMAL`)
 
-Campos:
-- `id` (PK)
-- `nombre`
-- `telefono`
-- `direccion`
-- `nit_ci`
+### 10. `compra_detalles`
+Almacena los ítems específicos ingresados al inventario en una compra.
+* `id automatico` (PK)
+* `id_compra` (FK)
+* `id_producto` (FK)
+* `fecha` (`TIMESTAMP`)
+* `cantidad` (`INT`)
+* `precio_costo` (`DECIMAL`)
+* `sub_total` (`DECIMAL`)
 
-El campo `nit_ci` puede ser opcional, ya que no todas las ventas requieren registrar los datos del cliente.
+---
 
-### 5. `empleados`
+## Relaciones Principales
 
-Almacena la información de las personas que trabajan en el minisúper, como cajeros o administradores.
-
-Campos:
-- `id` (PK)
-- `nombre`
-- `cargo`
-- `telefono`
-
-La información de acceso al sistema no se almacenará directamente en esta tabla, sino en la entidad `usuarios`.
-
-### 6. `usuarios`
-
-Almacena las credenciales de acceso al sistema y se relaciona con un empleado.
-
-Campos:
-- `id` (PK)
-- `id_empleado` (FK)
-- `usuario`
-- `password`
-- `activo`
-
-Un empleado podrá tener un usuario para ingresar al sistema. La contraseña deberá almacenarse de forma segura mediante un hash.
-
-### 7. `compras`
-
-Representa la cabecera de una compra realizada a un proveedor.
-
-Campos:
-- `id` (PK)
-- `id_proveedor` (FK)
-- `id_empleado` (FK)
-- `fecha`
-- `numero_factura`
-- `total`
-- `estado`
-
-El campo `numero_factura` puede ser opcional cuando una compra no cuente con factura.
-
-### 8. `detalle_compras`
-
-Almacena los productos específicos incluidos en cada compra.
-
-Campos:
-- `id` (PK)
-- `id_compra` (FK)
-- `id_producto` (FK)
-- `cantidad`
-- `precio_costo`
-- `subtotal`
-
-El `precio_costo` permite conservar el precio al que se adquirió el producto en esa compra, aunque posteriormente cambie.
-
-### 9. `ventas`
-
-Representa una venta realizada en el minisúper.
-
-Campos:
-- `id` (PK)
-- `id_empleado` (FK)
-- `id_cliente` (FK, opcional)
-- `fecha`
-- `subtotal`
-- `descuento`
-- `total`
-- `metodo_pago`
-- `estado`
-
-El campo `metodo_pago` permitirá registrar formas de pago como efectivo, QR o tarjeta.
-
-El campo `id_cliente` será opcional porque una venta puede realizarse sin registrar los datos de un cliente.
-
-### 10. `detalle_ventas`
-
-Almacena los productos específicos incluidos en cada venta.
-
-Campos:
-- `id` (PK)
-- `id_venta` (FK)
-- `id_producto` (FK)
-- `cantidad`
-- `precio_unitario`
-- `descuento`
-- `subtotal`
-
-## Relaciones principales
-
-- Una categoría puede tener muchos productos.
-- Un proveedor puede proporcionar muchos productos.
-- Un producto pertenece a una categoría y puede tener un proveedor principal.
-- Un proveedor puede tener muchas compras.
-- Una compra pertenece a un proveedor y es registrada por un empleado.
-- Una compra puede tener varios detalles de compra.
-- Un detalle de compra corresponde a un producto.
-- Un empleado puede tener un usuario para acceder al sistema.
-- Un empleado puede registrar muchas ventas.
-- Un cliente puede estar asociado a varias ventas, pero una venta puede no tener cliente registrado.
-- Una venta puede tener varios detalles de venta.
-- Un detalle de venta corresponde a un producto.
+- **Categoría ── (1:N) ── Productos:** Una categoría organiza múltiples productos.
+- **Proveedor ── (1:N) ── Productos:** Un proveedor surte varios productos del catálogo.
+- **Proveedor ── (1:N) ── Compras:** Un proveedor puede estar asociado a múltiples registros de compras.
+- **Trabajadores ── (1:1) ── Usuario:** Un trabajador cuenta con un usuario individual para autenticarse.
+- **Trabajadores ── (1:N) ── Ventas:** Un trabajador atiende y registra múltiples ventas.
+- **Trabajadores ── (1:N) ── Compras:** Un trabajador registra la recepción de las compras.
+- **Cliente ── (1:N) ── Ventas:** Un cliente puede tener asociadas varias ventas.
+- **Ventas ── (1:N) ── VentaDetalles:** Una venta se desglosa en uno o más detalles de producto.
+- **Productos ── (1:N) ── VentaDetalles:** Un producto aparece en múltiples registros de venta.
+- **Compras ── (1:N) ── CompraDetalles:** Una compra agrupa varios detalles de productos recibidos.
+- **Productos ── (1:N) ── CompraDetalles:** Un producto es abastecido a través de distintas compras.
