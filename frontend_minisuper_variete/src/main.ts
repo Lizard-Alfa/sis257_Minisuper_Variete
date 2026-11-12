@@ -12,7 +12,7 @@ import 'bootstrap'
 
 import App from './App.vue'
 import router from './router'
-// import { Mask } from 'primevue'
+import { Mask } from 'primevue'
 
 const app = createApp(App)
 
@@ -29,6 +29,6 @@ app.use(PrimeVue, {
     },
   },
 })
-// app.directive('mask', Mask)
+app.directive('mask', Mask)
 
 app.mount('#app')

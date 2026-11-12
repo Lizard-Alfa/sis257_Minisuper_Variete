@@ -43,8 +43,9 @@ async function eliminar() {
   mostrarConfirmDialog.value = false
 }
 
-function formatearPrecio(precio: number): string {
-  return precio?.toFixed(2) ?? '0.00'
+function formatearPrecio(precio: number | string): string {
+  const precioNum = typeof precio === 'string' ? parseFloat(precio) : precio
+  return precioNum?.toFixed(2) ?? '0.00'
 }
 
 function nombreProveedor(proveedor: any): string {
