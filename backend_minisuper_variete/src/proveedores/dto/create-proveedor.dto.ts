@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
-export class CreateProveedoreDto {
+export class CreateProveedorDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'El Nit o Ci es obligatorio' })
   @IsString({ message: 'El Nit o Ci debe ser tipo cadena' })
@@ -20,7 +20,7 @@ export class CreateProveedoreDto {
   @ApiProperty()
   @IsNotEmpty({ message: 'El apellido es obligatorio' })
   @IsString({ message: 'El apellido debe ser tipo cadena' })
-  @MaxLength(50, { message: 'El apellido no puede tener mas de 50 caracters' })
+  @MaxLength(50, { message: 'El apellido no puede tener mas de 50 caracteres' })
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly apellidos: string;
 
@@ -32,15 +32,16 @@ export class CreateProveedoreDto {
   readonly telefono: string;
 
   @ApiProperty()
-  @IsNotEmpty({ message: 'La dirreccion es obligatorio' })
+  @IsNotEmpty({ message: 'La dirreccion es obligatoria' })
   @IsString({ message: 'La direccion debe ser tipo cadena' })
-  @MaxLength(50, { message: 'La dereccion no puede tener mas de 50 caracters' })
+  @MaxLength(50, { message: 'La direccion no puede tener mas de 50 caracteres' })
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly direccion: string;
 
-  @ApiProperty()
-  @IsString({ message: 'El email debe ser tipo cadena' })
-  @MaxLength(30, { message: 'El email no puede tener mas de 30 caracters' })
-  @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
-  readonly email: string;
+@ApiProperty()
+@IsNotEmpty({ message: 'El email es obligatorio' })
+@IsEmail({}, { message: 'El email debe tener un formato válido (ej: usuario@dominio.com)' })
+@MaxLength(30, { message: 'El email no puede tener más de 30 caracteres' })
+@Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim().toLowerCase() : value))
+readonly email: string;
 }
