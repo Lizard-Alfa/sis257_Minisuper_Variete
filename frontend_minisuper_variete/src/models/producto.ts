@@ -1,22 +1,14 @@
-import type { Categoria } from './categoria'
-
-export interface Proveedor {
-  id: number
-  nitCi: string
-  nombres: string
-  apellidos: string
-  telefono?: string
-  direccion?: string
-  email?: string
-}
+import type { Categoria } from "./categoria"
+import type { Proveedor } from "./proveedor"
 
 export interface Producto {
   id: number
   codigo: string
   nombre: string
+  categoria: Categoria
+  proveedor: Proveedor
   precio: number
   unidad_medida: string
+  imagenUrl: string
   estado: boolean
-  categoria?: Categoria
-  proveedor?: Proveedor
 }

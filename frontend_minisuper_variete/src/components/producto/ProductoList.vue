@@ -9,11 +9,13 @@ const productos = ref<Producto[]>([])
 const busqueda = ref<string>('')
 const productoDelete = ref<Producto | null>(null)
 const mostrarConfirmDialog = ref<boolean>(false)
-
+const paginaActual = ref(1)
+const filasPorPagina = ref(10)
 const emit = defineEmits(['edit'])
 
 async function obtenerLista() {
   productos.value = await http.get(ENDPOINT).then((response) => response.data)
+  paginaActual.value = 1
 }
 
 const productosFiltrados = computed(() => {
@@ -27,6 +29,26 @@ const productosFiltrados = computed(() => {
         .includes(busqueda.value.toLowerCase()),
   )
 })
+
+const productosPaginados = computed(() => {
+  const inicio = (paginaActual.value - 1) * filasPorPagina.value
+  const fin = inicio + filasPorPagina.value
+  return productosFiltrados.value.slice(inicio, fin)
+})
+
+const totalPaginas = computed(() =>
+  Math.ceil(productosFiltrados.value.length / filasPorPagina.value) || 1,
+)
+
+function cambiarPagina(pagina: number) {
+  if (pagina >= 1 && pagina <= totalPaginas.value) {
+    paginaActual.value = pagina
+  }
+}
+
+function cambiarFilasPorPagina() {
+  paginaActual.value = 1
+}
 
 function emitirEdicion(producto: Producto) {
   emit('edit', producto)
@@ -53,6 +75,10 @@ function nombreProveedor(proveedor: any): string {
   return `${proveedor.nombres} ${proveedor.apellidos}`.trim()
 }
 
+function obtenerImagen(producto: Producto): string {
+  return producto.imagen_url || 'https://via.placeholder.com/60x60?text=Sin+Imagen'
+}
+
 onMounted(() => {
   obtenerLista()
 })
@@ -75,6 +101,7 @@ defineExpose({ obtenerLista })
       <thead class="table-dark">
         <tr>
           <th>Nro.</th>
+          <th>Imagen</th>
           <th>Código</th>
           <th>Nombre</th>
           <th>Categoría</th>
@@ -86,8 +113,16 @@ defineExpose({ obtenerLista })
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(producto, index) in productosFiltrados" :key="producto.id">
-          <td>{{ index + 1 }}</td>
+        <tr v-for="(producto, index) in productosPaginados" :key="producto.id">
+          <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
+          <td>
+            <img
+              :src="obtenerImagen(producto)"
+              :alt="producto.nombre"
+              style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
+            />
+          </td>
+          <!--<td><img :src="producto.imagenUrl" alt="foto" width="90" height="90" /></td>-->
           <td>{{ producto.codigo }}</td>
           <td>{{ producto.nombre }}</td>
           <td>{{ producto.categoria?.nombre ?? 'N/A' }}</td>
@@ -101,12 +136,7 @@ defineExpose({ obtenerLista })
             />
           </td>
           <td>
-            <Button
-              icon="pi pi-pencil"
-              aria-label="Editar"
-              text
-              @click="emitirEdicion(producto)"
-            />
+            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(producto)" />
             <Button
               icon="pi pi-trash"
               aria-label="Eliminar"
@@ -116,32 +146,52 @@ defineExpose({ obtenerLista })
             />
           </td>
         </tr>
-        <tr v-if="productosFiltrados.length === 0">
-          <td colspan="9" class="text-center">No se encontraron resultados</td>
+        <tr v-if="productosPaginados.length === 0">
+          <td colspan="10" class="text-center">No se encontraron resultados</td>
         </tr>
       </tbody>
     </table>
 
-    <Dialog
-      v-model:visible="mostrarConfirmDialog"
-      header="Confirmar Eliminación"
-      :style="{ width: '25rem' }"
-    >
-      <p>
-        ¿Estás seguro de que deseas eliminar el producto
-        <strong>{{ productoDelete?.nombre }}</strong>?
-      </p>
+    <!-- Paginar -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        <label class="me-2">Filas por página:</label>
+        <select
+          v-model.number="filasPorPagina"
+          @change="cambiarFilasPorPagina"
+          class="form-select form-select-sm d-inline-block w-auto"
+        >
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="20">20</option>
+        </select>
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+            <button class="page-link" @click="cambiarPagina(paginaActual - 1)">Anterior</button>
+          </li>
+          <li
+            v-for="pagina in totalPaginas"
+            :key="pagina"
+            class="page-item"
+            :class="{ active: paginaActual === pagina }"
+          >
+            <button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button>
+          </li>
+          <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+            <button class="page-link" @click="cambiarPagina(paginaActual + 1)">Siguiente</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Eliminación" :style="{ width: '25rem' }">
+      <p>¿Estás seguro de que deseas eliminar el producto <strong>{{ productoDelete?.nombre }}</strong>?</p>
       <div class="flex justify-end gap-2">
-        <Button
-          type="button"
-          label="Cancelar"
-          severity="secondary"
-          @click="mostrarConfirmDialog = false"
-        />
+        <Button type="button" label="Cancelar" severity="secondary" @click="mostrarConfirmDialog = false" />
         <Button type="button" label="Eliminar" severity="danger" @click="eliminar" />
       </div>
     </Dialog>
   </div>
 </template>
-
-<style scoped></style>

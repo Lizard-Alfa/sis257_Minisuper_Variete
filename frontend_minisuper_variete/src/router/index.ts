@@ -16,6 +16,12 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue'),
     },
     {
+      path: '/catalogo',
+      name: 'catalogo',
+      component: () => import('../views/CatalogoView.vue'),
+      meta: { public: true },
+    },
+    {
       path: '/categorias',
       name: 'categorias',
       component: () => import('../views/CategoriasView.vue'),
@@ -31,6 +37,24 @@ const router = createRouter({
       path: '/proveedores',
       name: 'proveedores',
       component: () => import('../views/ProveedoresView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/clientes',
+      name: 'clientes',
+      component: () => import('../views/ClientesView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/historial-ventas',
+      name: 'historial-ventas',
+      component: () => import('../views/HistorialVentasView.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: '/ventas',
+      name: 'ventas',
+      component: () => import('../views/VentasView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
     },
   ],

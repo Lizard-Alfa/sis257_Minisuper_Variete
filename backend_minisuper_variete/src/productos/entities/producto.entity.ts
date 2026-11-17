@@ -39,6 +39,9 @@ export class Producto {
   @Column({ type: 'boolean', default: true })
   estado: boolean;
 
+  @Column({ name: 'imagen_url', type: 'varchar', length: 500, nullable: true })
+  imagenUrl: string;
+
   @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;
 
@@ -47,5 +50,4 @@ export class Producto {
 
   @DeleteDateColumn({ name: 'fecha_eliminacion' })
   fechaEliminacion: Date;
-
 }

@@ -9,11 +9,13 @@ const proveedores = ref<Proveedor[]>([])
 const busqueda = ref<string>('')
 const proveedorDelete = ref<Proveedor | null>(null)
 const mostrarConfirmDialog = ref<boolean>(false)
-
+const paginaActual = ref(1)
+const filasPorPagina = ref(10)
 const emit = defineEmits(['edit'])
 
 async function obtenerLista() {
   proveedores.value = await http.get(ENDPOINT).then((response) => response.data)
+  paginaActual.value = 1
 }
 
 const proveedoresFiltrados = computed(() => {
@@ -27,6 +29,26 @@ const proveedoresFiltrados = computed(() => {
       proveedor.telefono.toLowerCase().includes(termino),
   )
 })
+
+const proveedoresPaginados = computed(() => {
+  const inicio = (paginaActual.value - 1) * filasPorPagina.value
+  const fin = inicio + filasPorPagina.value
+  return proveedoresFiltrados.value.slice(inicio, fin)
+})
+
+const totalPaginas = computed(() =>
+  Math.ceil(proveedoresFiltrados.value.length / filasPorPagina.value) || 1,
+)
+
+function cambiarPagina(pagina: number) {
+  if (pagina >= 1 && pagina <= totalPaginas.value) {
+    paginaActual.value = pagina
+  }
+}
+
+function cambiarFilasPorPagina() {
+  paginaActual.value = 1
+}
 
 function emitirEdicion(proveedor: Proveedor) {
   emit('edit', proveedor)
@@ -78,22 +100,15 @@ defineExpose({ obtenerLista })
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(proveedor, index) in proveedoresFiltrados" :key="proveedor.id">
-          <td>{{ index + 1 }}</td>
-          <td>
-            <Tag :value="proveedor.nitCi" severity="info" />
-          </td>
+        <tr v-for="(proveedor, index) in proveedoresPaginados" :key="proveedor.id">
+          <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
+          <td><Tag :value="proveedor.nitCi" severity="info" /></td>
           <td>{{ nombreCompleto(proveedor) }}</td>
           <td>{{ proveedor.telefono }}</td>
           <td>{{ proveedor.direccion }}</td>
           <td>{{ proveedor.email }}</td>
           <td>
-            <Button
-              icon="pi pi-pencil"
-              aria-label="Editar"
-              text
-              @click="emitirEdicion(proveedor)"
-            />
+            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(proveedor)" />
             <Button
               icon="pi pi-trash"
               aria-label="Eliminar"
@@ -103,32 +118,52 @@ defineExpose({ obtenerLista })
             />
           </td>
         </tr>
-        <tr v-if="proveedoresFiltrados.length === 0">
+        <tr v-if="proveedoresPaginados.length === 0">
           <td colspan="7" class="text-center">No se encontraron resultados</td>
         </tr>
       </tbody>
     </table>
 
-    <Dialog
-      v-model:visible="mostrarConfirmDialog"
-      header="Confirmar Eliminación"
-      :style="{ width: '25rem' }"
-    >
-      <p>
-        ¿Estás seguro de que deseas eliminar al proveedor
-        <strong>{{ proveedorDelete ? nombreCompleto(proveedorDelete) : '' }}</strong>?
-      </p>
+    <!-- Paginación -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <div>
+        <label class="me-2">Filas por página:</label>
+        <select
+          v-model.number="filasPorPagina"
+          @change="cambiarFilasPorPagina"
+          class="form-select form-select-sm d-inline-block w-auto"
+        >
+          <option :value="5">5</option>
+          <option :value="10">10</option>
+          <option :value="20">20</option>
+        </select>
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm mb-0">
+          <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+            <button class="page-link" @click="cambiarPagina(paginaActual - 1)">Anterior</button>
+          </li>
+          <li
+            v-for="pagina in totalPaginas"
+            :key="pagina"
+            class="page-item"
+            :class="{ active: paginaActual === pagina }"
+          >
+            <button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button>
+          </li>
+          <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+            <button class="page-link" @click="cambiarPagina(paginaActual + 1)">Siguiente</button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Eliminación" :style="{ width: '25rem' }">
+      <p>¿Estás seguro de que deseas eliminar al proveedor <strong>{{ proveedorDelete ? nombreCompleto(proveedorDelete) : '' }}</strong>?</p>
       <div class="flex justify-end gap-2">
-        <Button
-          type="button"
-          label="Cancelar"
-          severity="secondary"
-          @click="mostrarConfirmDialog = false"
-        />
+        <Button type="button" label="Cancelar" severity="secondary" @click="mostrarConfirmDialog = false" />
         <Button type="button" label="Eliminar" severity="danger" @click="eliminar" />
       </div>
     </Dialog>
   </div>
 </template>
-
-<style scoped></style>

@@ -38,10 +38,12 @@ export class CreateProveedorDto {
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly direccion: string;
 
-@ApiProperty()
-@IsNotEmpty({ message: 'El email es obligatorio' })
-@IsEmail({}, { message: 'El email debe tener un formato válido (ej: usuario@dominio.com)' })
-@MaxLength(30, { message: 'El email no puede tener más de 30 caracteres' })
-@Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim().toLowerCase() : value))
-readonly email: string;
+  @ApiProperty()
+  @IsNotEmpty({ message: 'El email es obligatorio' })
+  @IsEmail({}, { message: 'El email debe tener un formato válido (ej: usuario@dominio.com)' })
+  @MaxLength(30, { message: 'El email no puede tener más de 30 caracteres' })
+  @Transform(({ value }): string | undefined =>
+    typeof value == 'string' ? value.trim().toLowerCase() : value,
+  )
+  readonly email: string;
 }

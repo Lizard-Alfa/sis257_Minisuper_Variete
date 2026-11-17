@@ -8,6 +8,8 @@ import { CategoriasModule } from './categorias/categorias.module';
 import { ProductosModule } from './productos/productos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
+import { VentasModule } from './ventas/ventas.module';
+import { ClientesModule } from './clientes/clientes.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { AuthModule } from './auth/auth.module';
     ProductosModule,
     UsuariosModule,
     AuthModule,
+    VentasModule,
+    ClientesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

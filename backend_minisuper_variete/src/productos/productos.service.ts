@@ -21,27 +21,12 @@ export class ProductosService {
   async create(createProductoDto: CreateProductoDto): Promise<Producto> {
     let producto = await this.productosRepository.findOneBy({
       codigo: createProductoDto.codigo,
+      nombre: createProductoDto.nombre,
     });
-    if (producto) throw new ConflictException('El producto con ese código ya existe');
-
-    const categoria = await this.categoriasRepository.findOneBy({
-      id: createProductoDto.idCategoria,
-    });
-    if (!categoria) throw new NotFoundException('La categoría no existe');
-
-    const proveedor = await this.proveedoresRepository.findOneBy({
-      nitCi: createProductoDto.nitCiProveedor,
-    });
-    if (!proveedor) throw new NotFoundException('El proveedor no existe');
+    if (producto) throw new ConflictException('La canción ya existe en el álbum');
 
     producto = new Producto();
-    producto.codigo = createProductoDto.codigo;
-    producto.nombre = createProductoDto.nombre;
-    producto.precio = createProductoDto.precio;
-    producto.unidad_medida = createProductoDto.unidad_medida;
-    producto.categoria = categoria;
-    producto.proveedor = proveedor;
-
+    Object.assign(producto, createProductoDto);
     return this.productosRepository.save(producto);
   }
 
@@ -79,29 +64,7 @@ export class ProductosService {
 
   async update(id: number, updateProductoDto: UpdateProductoDto): Promise<Producto> {
     const producto = await this.findOne(id);
-
-    if (updateProductoDto.idCategoria !== undefined) {
-      const categoria = await this.categoriasRepository.findOneBy({
-        id: updateProductoDto.idCategoria,
-      });
-      if (!categoria) throw new NotFoundException('La categoría no existe');
-      producto.categoria = categoria;
-    }
-
-    if (updateProductoDto.nitCiProveedor !== undefined) {
-      const proveedor = await this.proveedoresRepository.findOneBy({
-        nitCi: updateProductoDto.nitCiProveedor,
-      });
-      if (!proveedor) throw new NotFoundException('El proveedor no existe');
-      producto.proveedor = proveedor;
-    }
-
-    if (updateProductoDto.codigo !== undefined) producto.codigo = updateProductoDto.codigo;
-    if (updateProductoDto.nombre !== undefined) producto.nombre = updateProductoDto.nombre;
-    if (updateProductoDto.precio !== undefined) producto.precio = updateProductoDto.precio;
-    if (updateProductoDto.unidad_medida !== undefined)
-      producto.unidad_medida = updateProductoDto.unidad_medida;
-
+    Object.assign(producto, updateProductoDto);
     return this.productosRepository.save(producto);
   }
 

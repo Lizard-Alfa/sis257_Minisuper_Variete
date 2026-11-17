@@ -8,7 +8,7 @@ const isAuthenticated = computed(() => !!authStore.token)
 
 <template>
   <div class="text-center py-5">
-    <h1 class="display-4 mb-4">Bienvenido a Minisúper Variété</h1>
+    <h1 class="display-4 mb-4">Bienvenido a Minisúper Variete</h1>
     <p class="lead mb-4">
       Tu tienda de confianza con los mejores productos al mejor precio.
     </p>
@@ -17,8 +17,8 @@ const isAuthenticated = computed(() => !!authStore.token)
       <RouterLink to="/login" class="btn btn-primary btn-lg me-3">
         <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
       </RouterLink>
-      <RouterLink to="/categorias" class="btn btn-outline-secondary btn-lg">
-        <i class="bi bi-tags"></i> Ver Categorías
+      <RouterLink to="/catalogo" class="btn btn-outline-secondary btn-lg">
+        <i class="bi bi-tags"></i> Ver Catalogo
       </RouterLink>
     </div>
 
@@ -26,8 +26,8 @@ const isAuthenticated = computed(() => !!authStore.token)
       <p class="text-success">
         <i class="bi bi-check-circle"></i> Sesión iniciada como <strong>{{ authStore.user }}</strong>
       </p>
-      <RouterLink to="/categorias" class="btn btn-primary btn-lg">
-        <i class="bi bi-tags"></i> Explorar Categorías
+      <RouterLink to="/catalogo" class="btn btn-primary btn-lg">
+        <i class="bi bi-tags"></i> Explorar Catalogo
       </RouterLink>
     </div>
   </div>

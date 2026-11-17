@@ -11,6 +11,7 @@ interface ProveedorOption {
   nitCi: string
   nombres: string
   apellidos: string
+  nombreCompleto: string  // 👈 Agregado
 }
 
 const props = defineProps({
@@ -31,6 +32,7 @@ const form = ref({
   unidad_medida: '',
   idCategoria: null as number | null,
   nitCiProveedor: '',
+  imagen_url: '',
 })
 
 const categorias = ref<Categoria[]>([])
@@ -52,7 +54,11 @@ async function cargarCategorias() {
 }
 
 async function cargarProveedores() {
-  proveedores.value = await http.get('proveedores').then((r) => r.data)
+  const data = await http.get('proveedores').then((r) => r.data)
+  proveedores.value = data.map((p: any) => ({
+    ...p,
+    nombreCompleto: `${p.nombres} ${p.apellidos}`.trim(),
+  }))
 }
 
 watch(
@@ -60,15 +66,20 @@ watch(
   async (visible) => {
     if (visible) {
       await Promise.all([cargarCategorias(), cargarProveedores()])
-
       if (props.modoEdicion && props.producto) {
+        // 👇 La propiedad 'imagen_url' no existe en el tipo 'Producto'.
+        const precioNum = typeof props.producto.precio === 'string'
+          ? parseFloat(props.producto.precio)
+          : props.producto.precio
+
         form.value = {
           codigo: props.producto.codigo ?? '',
           nombre: props.producto.nombre ?? '',
-          precio: props.producto.precio ?? 0,
+          precio: precioNum ?? 0,
           unidad_medida: props.producto.unidad_medida ?? '',
           idCategoria: props.producto.categoria?.id ?? null,
           nitCiProveedor: props.producto.proveedor?.nitCi ?? '',
+          imagen_url: props.producto.imagen_url ?? '',
         }
       } else {
         resetForm()
@@ -85,6 +96,7 @@ function resetForm() {
     unidad_medida: '',
     idCategoria: null,
     nitCiProveedor: '',
+    imagen_url: '',
   }
 }
 
@@ -97,7 +109,6 @@ const dialogVisible = computed({
 
 async function handleSave() {
   try {
-
     if (!form.value.codigo?.trim()) {
       alert('El código es obligatorio')
       return
@@ -123,13 +134,17 @@ async function handleSave() {
       return
     }
 
-    const body = {
+    const body: any = {
       codigo: form.value.codigo.trim(),
       nombre: form.value.nombre.trim(),
-      precio: form.value.precio,
+      precio: Number(form.value.precio),
       unidad_medida: form.value.unidad_medida.trim(),
       idCategoria: form.value.idCategoria,
       nitCiProveedor: form.value.nitCiProveedor,
+    }
+
+    if (form.value.imagen_url?.trim()) {
+      body.imagen_url = form.value.imagen_url.trim()
     }
 
     if (props.modoEdicion && props.producto) {
@@ -157,7 +172,7 @@ async function handleSave() {
     <Dialog
       v-model:visible="dialogVisible"
       :header="props.modoEdicion ? 'Editar Producto' : 'Nuevo Producto'"
-      :style="{ width: '35rem' }"
+      :style="{ width: '40rem' }"
       modal
     >
       <div class="flex flex-column gap-3">
@@ -244,6 +259,25 @@ async function handleSave() {
             />
           </div>
         </div>
+
+        <div class="flex flex-column gap-2">
+          <label for="imagen_url" class="font-semibold">URL de Imagen (opcional)</label>
+          <InputText
+            id="imagen_url"
+            v-model="form.imagen_url"
+            placeholder="https://ejemplo.com/imagen.jpg"
+            autocomplete="off"
+          />
+          <small v-if="form.imagen_url" class="text-color-secondary">
+            Vista previa:
+            <img
+              :src="form.imagen_url"
+              alt="Vista previa"
+              style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; margin-top: 5px;"
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            />
+          </small>
+        </div>
       </div>
 
       <div class="flex justify-end gap-2 mt-4">
@@ -260,4 +294,17 @@ async function handleSave() {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(.p-select-label) {
+  color: #fff !important;
+}
+:deep(.p-select-option) {
+  color: #413f3f !important;
+}
+:deep(.p-inputtext) {
+  color: #fff !important;
+}
+:deep(.p-inputnumber-input) {
+  color: #fff !important;
+}
+</style>

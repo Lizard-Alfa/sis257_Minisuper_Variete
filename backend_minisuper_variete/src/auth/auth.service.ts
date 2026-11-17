@@ -25,7 +25,7 @@ export class AuthService {
   async getAccessToken(payload: JwtPayload) {
     type StringValue = `${number}s`;
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: process.env.JWT_TOKEN ?? 'default_secret',
+      secret: process.env.JWT_SECRET ?? 'default_secret',
       expiresIn: process.env.JWT_TOKEN_EXPIRATION as StringValue,
     });
     return accessToken;
