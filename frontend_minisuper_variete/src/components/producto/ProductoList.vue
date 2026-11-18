@@ -23,10 +23,8 @@ const productosFiltrados = computed(() => {
     (producto) =>
       producto.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
       producto.codigo.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-      producto.categoria?.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-      `${producto.proveedor?.nombres} ${producto.proveedor?.apellidos}`
-        .toLowerCase()
-        .includes(busqueda.value.toLowerCase()),
+      producto.categoria.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      producto.proveedor.nombres.toLowerCase().includes(busqueda.value.toLowerCase())
   )
 })
 
@@ -76,7 +74,7 @@ function nombreProveedor(proveedor: any): string {
 }
 
 function obtenerImagen(producto: Producto): string {
-  return producto.imagen_url || 'https://via.placeholder.com/60x60?text=Sin+Imagen'
+  return producto.imagen || 'https://via.placeholder.com/60x60?text=Sin+Imagen'
 }
 
 onMounted(() => {
@@ -106,9 +104,11 @@ defineExpose({ obtenerLista })
           <th>Nombre</th>
           <th>Categoría</th>
           <th>Proveedor</th>
+          <th>Unidad de Medida</th>
           <th>Precio</th>
-          <th>Unidad</th>
-          <th>Estado</th>
+          <th>Precio con descuento</th>
+          <th>Descuento Inicio</th>
+          <th>Descuento Fin</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -122,19 +122,17 @@ defineExpose({ obtenerLista })
               style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
             />
           </td>
-          <!--<td><img :src="producto.imagenUrl" alt="foto" width="90" height="90" /></td>-->
           <td>{{ producto.codigo }}</td>
           <td>{{ producto.nombre }}</td>
-          <td>{{ producto.categoria?.nombre ?? 'N/A' }}</td>
-          <td>{{ nombreProveedor(producto.proveedor) }}</td>
-          <td class="text-end">Bs. {{ formatearPrecio(producto.precio) }}</td>
-          <td>{{ producto.unidad_medida }}</td>
-          <td>
-            <Tag
-              :value="producto.estado ? 'Activo' : 'Inactivo'"
-              :severity="producto.estado ? 'success' : 'danger'"
-            />
-          </td>
+          <td>{{ producto.categoria.nombre }}</td>
+          <td>{{producto.proveedor.nombres}}</td>
+          <td>{{producto.unidadMedida}}</td>
+          <td>{{producto.stock}}</td>
+          <td>{{producto.stockMinimo}}</td>
+          <td>{{producto.precio}}</td>
+          <td>{{producto.precioDescuento}}</td>
+          <td>{{producto.descuentoInicio}}</td>
+          <td>{{producto.descuentoFin}}</td>
           <td>
             <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(producto)" />
             <Button
@@ -195,3 +193,4 @@ defineExpose({ obtenerLista })
     </Dialog>
   </div>
 </template>
+<style> </style>

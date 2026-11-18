@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('productos')
 export class ProductosController {
   constructor(private readonly productosService: ProductosService) {}
@@ -17,7 +21,7 @@ export class ProductosController {
     return this.productosService.findAll();
   }
 
-  @Get('categoria/:id')
+ /*@Get('categoria/:id')
   findByCategoria(@Param('id') id: string) {
     return this.productosService.findByCategoria(+id);
   }
@@ -25,7 +29,7 @@ export class ProductosController {
   @Get('proveedor/:nitCi')
   findByProveedor(@Param('nitCi') nitCi: string) {
     return this.productosService.findByProveedor(nitCi);
-  }
+  }*/
 
   @Get(':id')
   findOne(@Param('id') id: string) {

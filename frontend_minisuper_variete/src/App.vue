@@ -73,7 +73,7 @@ function closeMenu() {
                 <i class="bi bi-people"></i> Clientes
               </RouterLink>
             </li>
-            <li class="nav-item">
+ <!--         <li class="nav-item">
               <RouterLink to="/ventas" class="nav-link" @click="closeMenu">
                 <i class="bi bi-cart"></i> Ventas
               </RouterLink>
@@ -82,7 +82,7 @@ function closeMenu() {
               <RouterLink to="/historial-ventas" class="nav-link" @click="closeMenu">
                 <i class="bi bi-clock-history"></i> Historial
               </RouterLink>
-            </li>
+            </li>-->
           </template>
         </ul>
 

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cliente } from './entities/cliente.entity';
@@ -8,33 +8,36 @@ import { Like } from 'typeorm';
 
 @Injectable()
 export class ClientesService {
-  constructor(@InjectRepository(Cliente) private clientesRepo: Repository<Cliente>) {}
+  constructor(@InjectRepository(Cliente) private clientesRepository: Repository<Cliente>) {}
 
-  create(dto: CreateClienteDto) {
-    const cliente = this.clientesRepo.create(dto);
-    return this.clientesRepo.save(cliente);
-  }
-
-  findAll() {
-    return this.clientesRepo.find();
-  }
-
-  findOne(clienteCi: string) {
-    return this.clientesRepo.findOneBy({ clienteCi });
-  }
-
-  update(clienteCi: string, dto: UpdateClienteDto) {
-    return this.clientesRepo.update({ clienteCi }, dto);
-  }
-
-  remove(clienteCi: string) {
-    return this.clientesRepo.delete({ clienteCi });
-  }
-
-  async buscarPorCi(ci: string) {
-    return this.clientesRepo.find({
-      where: { clienteCi: Like(`%${ci}%`) },
-      take: 10,
+  async create(createClienteDto: CreateClienteDto): Promise<Cliente> {
+    let cliente = await this.clientesRepository.findOneBy({
+      nitCi: createClienteDto.nitCi,
     });
+    if (cliente) throw new ConflictException('El ci o nit ya existe');
+    cliente = new Cliente();
+    Object.assign(cliente, createClienteDto);
+    return this.clientesRepository.save(cliente);
+  }
+
+  async findAll(): Promise<Cliente[]> {
+    return this.clientesRepository.find({ order: { nombres: 'ASC' } });
+  }
+
+  async findOne(id: number): Promise<Cliente> {
+    const cliente = await this.clientesRepository.findOneBy({ id });
+    if (!cliente) throw new NotFoundException('La cliente no existe');
+    return cliente;
+  }
+
+  async update(id: number, updateClienteDto: UpdateClienteDto): Promise<Cliente> {
+    const cliente = await this.findOne(id);
+    Object.assign(cliente, updateClienteDto);
+    return this.clientesRepository.save(cliente);
+  }
+
+  async remove(id: number): Promise<Cliente> {
+    const cliente = await this.findOne(id);
+    return this.clientesRepository.softRemove(cliente);
   }
 }

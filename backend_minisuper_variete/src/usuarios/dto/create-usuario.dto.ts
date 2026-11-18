@@ -1,8 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsBoolean, IsDefined, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateUsuarioDto {
+  @ApiProperty()
+  @IsDefined({ message: 'El id del trabajador  es obligatorio' })
+  @IsInt({ message: 'El id del trabajador debe ser tipo numérico' })
+  readonly idTrabajador: number;
+
   @ApiProperty()
   @IsNotEmpty({ message: 'El usuario es obligatorio' })
   @IsString({ message: 'El usuario debe ser de tipo cadena' })
@@ -25,8 +30,4 @@ export class CreateUsuarioDto {
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly rol: string;
 
-  @ApiPropertyOptional({ default: false })
-  @IsOptional()
-  @IsBoolean({ message: 'El campo premium debe ser un valor booleano' })
-  readonly premium?: boolean;
 }

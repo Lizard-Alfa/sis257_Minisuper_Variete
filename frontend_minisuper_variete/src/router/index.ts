@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import { useAuthStore } from '@/stores/index'
+import { getTokenFromLocalStorage } from '@/helpers/index.ts'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,7 +46,7 @@ const router = createRouter({
       component: () => import('../views/ClientesView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
     },
-    {
+    /*{
       path: '/historial-ventas',
       name: 'historial-ventas',
       component: () => import('../views/HistorialVentasView.vue'),
@@ -56,24 +57,20 @@ const router = createRouter({
       name: 'ventas',
       component: () => import('../views/VentasView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
-    },
+    },*/
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to) => {
+  const publicPages = ['/login']
+  const authRequired = !publicPages.includes(to.path)
   const authStore = useAuthStore()
-  const isAuthenticated = !!authStore.token
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  if (authRequired && !getTokenFromLocalStorage()) {
+    if (authStore) authStore.logout()
     authStore.returnUrl = to.fullPath
-    return next('/login')
+    return '/login'
   }
-
-  if (to.path === '/login' && isAuthenticated) {
-    return next('/categorias')
-  }
-
-  next()
 })
 
 export default router

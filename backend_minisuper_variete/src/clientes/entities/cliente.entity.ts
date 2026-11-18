@@ -1,13 +1,35 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('clientes')
 export class Cliente {
-  @PrimaryColumn({ name: 'cliente_ci', type: 'varchar', length: 20 })
-  clienteCi: string;
+  @PrimaryGeneratedColumn('identity')
+  id: number;
 
-  @Column({ name: 'cliente_nombre', type: 'varchar', length: 100 })
-  clienteNombre: string;
+  @Column('varchar', { length: 15, name: 'nit_ci' })
+  nitCi: string;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column('varchar', { length: 50 })
+  nombres: string;
+
+  @Column('varchar', { length: 50 })
+  apllidos: string;
+
+  @Column('varchar', { length: 15 })
   telefono: string;
+
+  @CreateDateColumn({ name: 'fecha_creacion' })
+  fechaCreacion: Date;
+
+  @UpdateDateColumn({ name: 'fecha_modificacion' })
+  fechaModificacion: Date;
+
+  @DeleteDateColumn({ name: 'fecha_eliminacion' })
+  fechaEliminacion: Date;
 }

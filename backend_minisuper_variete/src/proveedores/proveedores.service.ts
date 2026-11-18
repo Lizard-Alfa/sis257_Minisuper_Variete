@@ -20,7 +20,7 @@ export class ProveedoresService {
   }
 
   async findAll(): Promise<Proveedor[]> {
-    return this.proveedoresRepository.find({ order: { nitCi: 'ASC' } });
+    return this.proveedoresRepository.find({ order: { nombres: 'ASC' } });
   }
 
   async findOne(id: number): Promise<Proveedor> {

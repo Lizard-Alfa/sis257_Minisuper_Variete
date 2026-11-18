@@ -2,7 +2,7 @@ export interface Proveedor {
   id: number
   nitCi: string
   nombres: string
-  apellidos: string
+  razonSocial: string
   telefono: string
   direccion: string
   email: string

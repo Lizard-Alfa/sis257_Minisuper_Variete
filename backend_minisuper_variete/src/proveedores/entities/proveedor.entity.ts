@@ -14,19 +14,19 @@ export class Proveedor {
   @PrimaryGeneratedColumn('identity')
   id: number;
 
-  @Column('varchar', { length: 20, name: 'nit_ci', unique: true })
+  @Column('varchar', { length: 15, name: 'nit_ci' })
   nitCi: string;
 
   @Column('varchar', { length: 50 })
   nombres: string;
 
-  @Column('varchar', { length: 50 })
-  apellidos: string;
+  @Column('varchar', { length: 50, name: 'razon_social' })
+  razonSocial: string;
 
   @Column('varchar', { length: 20 })
   telefono: string;
 
-  @Column('varchar', { length: 50 })
+  @Column('varchar', { length: 100 })
   direccion: string;
 
   @Column('varchar', { length: 30 })

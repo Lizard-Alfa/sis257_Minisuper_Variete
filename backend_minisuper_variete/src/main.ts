@@ -16,12 +16,6 @@ async function bootstrap() {
     .setDescription('API Rest para MiniSuper')
     .setVersion('1.5')
     .addTag('proveedores')
-    .addTag('categorias')
-    .addTag('productos')
-    .addTag('usuarios')
-    .addTag('auth')
-    .addTag('ventas')
-    .addTag('clientes')
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',

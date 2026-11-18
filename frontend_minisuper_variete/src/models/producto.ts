@@ -1,14 +1,20 @@
-import type { Categoria } from "./categoria"
-import type { Proveedor } from "./proveedor"
+import type { Categoria } from "./categoria";
+import type { Proveedor } from "./proveedor";
 
 export interface Producto {
-  id: number
+  id: number;
   codigo: string
   nombre: string
-  categoria: Categoria
-  proveedor: Proveedor
+  idCategoria: number
+  idProveedor: number
+  imagen: string
+  unidadMedida: string
+  stock: number
+  stockMinimo: number
   precio: number
-  unidad_medida: string
-  imagenUrl: string
-  estado: boolean
+  precioDescuento: number
+  descuentoInicio: Date|null
+  descuentoFin: Date|null
+  proveedor : Proveedor
+  categoria : Categoria
 }
