@@ -4,15 +4,21 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { compare, genSalt, hash } from 'bcryptjs';
+import { Trabajador } from '../../trabajadores/entities/trabajador.entity';
 
 @Entity('usuarios')
 export class Usuario {
   @PrimaryGeneratedColumn('identity')
   id: number;
+
+  @Column('integer', { name: 'id_trabajador' })
+  idTrabajador: number;
 
   @Column('varchar', { length: 12 })
   usuario: string;
@@ -36,6 +42,7 @@ export class Usuario {
   fechaEliminacion: Date;
 
   @BeforeInsert()
+  @BeforeInsert()
   async hashPasswordOnInsert() {
     if (this.clave) {
       const salt = await genSalt();
@@ -46,4 +53,11 @@ export class Usuario {
   async validatePassword(plainPassword: string): Promise<boolean> {
     return compare(plainPassword, this.clave);
   }
+<<<<<<< HEAD
 }
+=======
+  @OneToOne(() => Trabajador, trabajadores => trabajadores.usuarios)
+  @JoinColumn({ name: 'id_trabajador', referencedColumnName: 'id' })
+  trabajador: Trabajador;
+}
+>>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1

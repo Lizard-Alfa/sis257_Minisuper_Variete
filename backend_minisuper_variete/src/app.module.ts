@@ -9,7 +9,11 @@ import { CategoriasModule } from './categorias/categorias.module';
 import { ProductosModule } from './productos/productos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { ClientesModule } from './clientes/clientes.module';
+<<<<<<< HEAD
 //import { TrabajadoresModule } from './trabajadores/trabajadores.module';
+=======
+import { TrabajadoresModule } from './trabajadores/trabajadores.module';
+>>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
 import { VentasModule } from './ventas/ventas.module';
 
 @Module({
@@ -30,7 +34,11 @@ import { VentasModule } from './ventas/ventas.module';
     CategoriasModule,
     ProductosModule,
     UsuariosModule,
+<<<<<<< HEAD
     //TrabajadoresModule,
+=======
+    TrabajadoresModule,
+>>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
     ClientesModule,
     AuthModule,
     VentasModule,

@@ -15,7 +15,10 @@ import { UpdateClienteDto } from './dto/update-cliente.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
+<<<<<<< HEAD
 @ApiTags('clientes')
+=======
+>>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('clientes')
@@ -32,23 +35,23 @@ export class ClientesController {
     return this.clientesService.findAll();
   }
 
-  @Get('buscar')
+  /*@Get('buscar')
   async buscarPorCi(@Query('ci') ci: string) {
     return this.clientesService.buscarPorCi(ci);
+  }*/
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.clientesService.findOne(+id); // Usamos +id porque la PK es un número
   }
 
-  @Get(':clienteCi')
-  findOne(@Param('clienteCi') clienteCi: string) {
-    return this.clientesService.findOne(clienteCi);
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateClienteDto: UpdateClienteDto) {
+    return this.clientesService.update(+id, updateClienteDto);
   }
 
-  @Patch(':clienteCi')
-  update(@Param('clienteCi') clienteCi: string, @Body() updateClienteDto: UpdateClienteDto) {
-    return this.clientesService.update(clienteCi, updateClienteDto);
-  }
-
-  @Delete(':clienteCi')
-  remove(@Param('clienteCi') clienteCi: string) {
-    return this.clientesService.remove(clienteCi);
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.clientesService.remove(+id);
   }
 }
