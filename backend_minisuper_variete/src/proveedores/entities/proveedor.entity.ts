@@ -8,25 +8,26 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Producto } from '../../productos/entities/producto.entity';
+import { Venta } from '../../ventas/entities/venta.entity';
 
 @Entity('proveedores')
 export class Proveedor {
   @PrimaryGeneratedColumn('identity')
   id: number;
 
-  @Column('varchar', { length: 20, name: 'nit_ci', unique: true })
+  @Column('varchar', { length: 15, name: 'nit_ci' })
   nitCi: string;
 
   @Column('varchar', { length: 50 })
   nombres: string;
 
-  @Column('varchar', { length: 50 })
-  apellidos: string;
+  @Column('varchar', { length: 50, name: 'razon_social' })
+  razonSocial: string;
 
   @Column('varchar', { length: 20 })
   telefono: string;
 
-  @Column('varchar', { length: 50 })
+  @Column('varchar', { length: 100 })
   direccion: string;
 
   @Column('varchar', { length: 30 })
@@ -43,4 +44,6 @@ export class Proveedor {
 
   @OneToMany(() => Producto, producto => producto.proveedor)
   productos: Producto[];
+  @OneToMany(() => Venta, venta => venta.cliente)
+  ventas: Venta[];
 }

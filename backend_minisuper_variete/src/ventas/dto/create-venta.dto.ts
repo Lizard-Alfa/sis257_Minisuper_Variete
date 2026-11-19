@@ -1,9 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  ArrayNotEmpty,
+  ArrayMinSize,
   IsArray,
-  IsEnum,
+  IsIn,
   IsInt,
   IsNumber,
   IsOptional,
@@ -12,46 +12,53 @@ import {
   Min,
   ValidateNested,
 } from 'class-validator';
-import { MetodoPago } from '../entities/venta.entity';
 
-class DetalleDto {
-  @ApiProperty({ example: 1 })
-  @IsInt({ message: 'El ID del producto debe ser un número entero' })
-  @Min(1, { message: 'El ID del producto debe ser mayor a 0' })
-  idProducto: number;
+export class CreateVentaDetalleDto {
+  @ApiProperty()
+  @IsInt()
+  readonly idProducto: number;
 
-  @ApiProperty({ example: 2 })
-  @IsInt({ message: 'La cantidad debe ser un número entero' })
-  @Min(1, { message: 'La cantidad mínima es 1' })
-  cantidad: number;
+  @ApiProperty()
+  @IsInt()
+  @Min(1)
+  readonly cantidad: number;
 }
 
 export class CreateVentaDto {
-  @ApiProperty({ type: [DetalleDto] })
-  @IsArray({ message: 'Los detalles deben ser un arreglo' })
-  @ArrayNotEmpty({ message: 'La venta debe tener al menos un producto' })
+  @ApiProperty({ required: false, default: '0' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(15)
+  readonly clienteCi?: string;
+
+  @ApiProperty({ required: false, default: 'Cliente Ocasional' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  readonly clienteNombre?: string;
+
+  @ApiProperty({ enum: ['efectivo', 'tarjeta', 'qr'], default: 'efectivo' })
+  @IsOptional()
+  @IsString()
+  @IsIn(['efectivo', 'tarjeta', 'qr'])
+  readonly metodoPago?: string;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  readonly montoPagado?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  readonly observaciones?: string;
+
+  @ApiProperty({ type: [CreateVentaDetalleDto] })
+  @IsArray()
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
-  @Type(() => DetalleDto)
-  detalles: DetalleDto[];
-
-  @ApiPropertyOptional({ example: '1234567' })
-  @IsOptional()
-  @IsString({ message: 'El CI debe ser tipo cadena' })
-  @MaxLength(20, { message: 'El CI no puede tener más de 20 caracteres' })
-  clienteCi?: string;
-
-  @ApiProperty({ enum: MetodoPago, example: 'efectivo' })
-  @IsEnum(MetodoPago, { message: 'El método de pago debe ser: efectivo, tarjeta o qr' })
-  metodoPago: MetodoPago;
-
-  @ApiProperty()
-  @IsNumber({}, { message: 'El monto pagado debe ser un número' })
-  @Min(0, { message: 'El monto pagado no puede ser negativo' })
-  montoPagado: number;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString({ message: 'Las observaciones deben ser tipo cadena' })
-  @MaxLength(500, { message: 'Las observaciones no pueden exceder 500 caracteres' })
-  observaciones?: string;
+  @Type(() => CreateVentaDetalleDto)
+  readonly detalles: CreateVentaDetalleDto[];
 }

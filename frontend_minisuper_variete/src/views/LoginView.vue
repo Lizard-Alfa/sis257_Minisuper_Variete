@@ -5,25 +5,10 @@ import { useAuthStore } from '@/stores/index'
 const usuario = ref('')
 const clave = ref('')
 const error = ref(false)
-const loading = ref(false)
 
-async function onSubmit() {
-  if (!usuario.value.trim() || !clave.value.trim()) {
-    error.value = true
-    return
-  }
-
-  loading.value = true
-  error.value = false
-
+function onSubmit() {
   const authStore = useAuthStore()
-  try {
-    await authStore.login(usuario.value, clave.value)
-  } catch {
-    error.value = true
-  } finally {
-    loading.value = false
-  }
+  authStore.login(usuario.value, clave.value).catch(() => (error.value = true))
 }
 </script>
 
@@ -32,14 +17,13 @@ async function onSubmit() {
     <h1 class="text-center">Iniciar Sesión</h1>
     <form class="form" @submit.prevent="onSubmit">
       <label class="form-label">Usuario:</label>
-      <input v-model="usuario" type="text" class="form-input" placeholder="Usuario" autofocus :disabled="loading" />
+      <input v-model="usuario" type="text" class="form-input" placeholder="Usuario" autofocus />
 
       <label class="form-label">Contraseña:</label>
-      <input v-model="clave" type="password" class="form-input" placeholder="Contraseña" :disabled="loading" />
+      <input v-model="clave" type="password" class="form-input" placeholder="Contraseña" />
 
-      <p v-if="error" class="text-danger text-center mt-3">Usuario y/o contraseña incorrectos</p>
-
-      <input type="submit" class="form-submit" :value="loading ? 'Ingresando...' : 'Ingresar'" :disabled="loading" />
+      <p v-if="error" class="text-danger">Usuario y/o contraseña incorrectos</p>
+      <input type="submit" class="form-submit" value="Ingresar" />
     </form>
   </div>
 </template>
@@ -58,11 +42,13 @@ async function onSubmit() {
   padding: 40px;
   box-shadow: 0 4px 10px 4px rgba(0, 0, 0, 0.3);
 }
+
 .form-label {
   margin-top: 2rem;
   color: white;
   margin-bottom: 0.5rem;
 }
+
 .form-input {
   padding: 10px 15px;
   background: none;
@@ -70,8 +56,9 @@ async function onSubmit() {
   border: 1px solid white;
   color: white;
 }
+
 .form-submit {
-  background: #ee0b07;
+  background: #ee5007;
   border: none;
   border-radius: 5rem;
   color: white;

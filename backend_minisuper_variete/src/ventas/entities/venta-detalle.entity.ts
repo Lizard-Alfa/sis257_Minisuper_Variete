@@ -7,20 +7,29 @@ export class VentaDetalle {
   @PrimaryGeneratedColumn('identity')
   id: number;
 
-  @ManyToOne(() => Venta, (venta) => venta.detalles, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'id_venta' })
-  venta: Venta;
+  @Column('integer', { name: 'id_venta' })
+  idVenta: number;
 
-  @ManyToOne(() => Producto)
-  @JoinColumn({ name: 'id_producto' })
-  producto: Producto;
+  @Column('integer', { name: 'id_producto' })
+  idProducto: number;
 
-  @Column({ type: 'integer' })
+  @Column('integer')
   cantidad: number;
 
-  @Column({ name: 'precio_unitario', type: 'decimal', precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2, name: 'descuento_monto', default: 0 })
+  descuentoMonto: number;
+
+  @Column('decimal', { precision: 10, scale: 2, name: 'precio_unitario' })
   precioUnitario: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column('decimal', { precision: 10, scale: 2 })
   subtotal: number;
+
+  @ManyToOne(() => Venta, (venta) => venta.detalles)
+  @JoinColumn({ name: 'id_venta', referencedColumnName: 'id' })
+  venta: Venta;
+
+  @ManyToOne(() => Producto, (producto) => producto.ventaDetalles)
+  @JoinColumn({ name: 'id_producto', referencedColumnName: 'id' })
+  producto: Producto;
 }

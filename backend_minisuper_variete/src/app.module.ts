@@ -3,13 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 import { ProveedoresModule } from './proveedores/proveedores.module';
 import { CategoriasModule } from './categorias/categorias.module';
 import { ProductosModule } from './productos/productos.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
-import { AuthModule } from './auth/auth.module';
-import { VentasModule } from './ventas/ventas.module';
 import { ClientesModule } from './clientes/clientes.module';
+//import { TrabajadoresModule } from './trabajadores/trabajadores.module';
+import { VentasModule } from './ventas/ventas.module';
 
 @Module({
   imports: [
@@ -29,9 +30,10 @@ import { ClientesModule } from './clientes/clientes.module';
     CategoriasModule,
     ProductosModule,
     UsuariosModule,
+    //TrabajadoresModule,
+    ClientesModule,
     AuthModule,
     VentasModule,
-    ClientesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

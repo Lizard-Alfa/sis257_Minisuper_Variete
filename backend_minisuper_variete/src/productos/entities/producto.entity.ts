@@ -5,42 +5,54 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Categoria } from '../../categorias/entities/categoria.entity';
 import { Proveedor } from '../../proveedores/entities/proveedor.entity';
+import { VentaDetalle } from '../../ventas/entities/venta-detalle.entity';
 
 @Entity('productos')
 export class Producto {
   @PrimaryGeneratedColumn('identity')
   id: number;
 
-  @Column('varchar', { length: 10, unique: true })
+  @Column('varchar', { length: 10 })
   codigo: string;
 
   @Column('varchar', { length: 100 })
   nombre: string;
 
-  @ManyToOne(() => Categoria, categoria => categoria.productos)
-  @JoinColumn({ name: 'id_categoria', referencedColumnName: 'id' })
-  categoria: Categoria;
+  @Column('integer', { name: 'id_categoria' })
+  idCategoria: number;
 
-  @ManyToOne(() => Proveedor, proveedor => proveedor.productos)
-  @JoinColumn({ name: 'nit_ci_proveedor', referencedColumnName: 'nitCi' })
-  proveedor: Proveedor;
+  @Column('integer', { name: 'id_proveedor' })
+  idProveedor: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column('varchar', { length: 500 })
+  imagen: string;
+
+  @Column('varchar', { length: 50, name: 'unidad_medida' })
+  unidadMedida: string;
+
+  @Column()
+  stock: number;
+
+  @Column('integer', { name: 'stock_minimo' })
+  stockMinimo: number;
+
+  @Column('decimal', { precision: 10, scale: 2 })
   precio: number;
 
-  @Column('varchar', { length: 20 })
-  unidad_medida: string;
+  @Column('decimal', { precision: 10, scale: 2, name: 'precio_descuento' })
+  precioDescuento: number;
 
-  @Column({ type: 'boolean', default: true })
-  estado: boolean;
+  @Column('date', { name: 'descuento_inicio', nullable: true })
+  descuentoInicio: Date | null;
 
-  @Column({ name: 'imagen_url', type: 'varchar', length: 500, nullable: true })
-  imagenUrl: string;
+  @Column('date', { name: 'descuento_fin', nullable: true })
+  descuentoFin: Date | null;
 
   @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;
@@ -50,4 +62,14 @@ export class Producto {
 
   @DeleteDateColumn({ name: 'fecha_eliminacion' })
   fechaEliminacion: Date;
+
+  @ManyToOne(() => Categoria, categoria => categoria.productos)
+  @JoinColumn({ name: 'id_categoria', referencedColumnName: 'id' })
+  categoria: Categoria;
+
+  @ManyToOne(() => Proveedor, proveedor => proveedor.productos)
+  @JoinColumn({ name: 'id_proveedor', referencedColumnName: 'id' })
+  proveedor: Proveedor;
+  @OneToMany(() => VentaDetalle, detalle => detalle.producto)
+  ventaDetalles: VentaDetalle[];
 }

@@ -2,20 +2,14 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Producto } from './entities/producto.entity';
-import { Categoria } from '../categorias/entities/categoria.entity';
-import { Proveedor } from '../proveedores/entities/proveedor.entity';
 import { Repository } from 'typeorm';
+import { Producto } from './entities/producto.entity';
 
 @Injectable()
 export class ProductosService {
   constructor(
     @InjectRepository(Producto)
     private readonly productosRepository: Repository<Producto>,
-    @InjectRepository(Categoria)
-    private readonly categoriasRepository: Repository<Categoria>,
-    @InjectRepository(Proveedor)
-    private readonly proveedoresRepository: Repository<Proveedor>,
   ) {}
 
   async create(createProductoDto: CreateProductoDto): Promise<Producto> {
@@ -23,21 +17,20 @@ export class ProductosService {
       codigo: createProductoDto.codigo,
       nombre: createProductoDto.nombre,
     });
-    if (producto) throw new ConflictException('La canción ya existe en el álbum');
+    if (producto) throw new ConflictException('El pruducto ya existe');
 
     producto = new Producto();
     Object.assign(producto, createProductoDto);
     return this.productosRepository.save(producto);
   }
 
-  async findAll(): Promise<Producto[]> {
-    return this.productosRepository.find({
-      relations: { categoria: true, proveedor: true },
-      order: { nombre: 'ASC' },
+  async findAll() {
+    return await this.productosRepository.find({
+      relations: { categoria: true, proveedor: true }, // 👈 Esto obliga al backend a traer el objeto completo
     });
   }
 
-  async findByCategoria(idCategoria: number): Promise<Producto[]> {
+  /*async findByCategoria(idCategoria: number): Promise<Producto[]> {
     return this.productosRepository.find({
       where: { categoria: { id: idCategoria } },
       relations: { categoria: true, proveedor: true },
@@ -51,7 +44,7 @@ export class ProductosService {
       relations: { categoria: true, proveedor: true },
       order: { nombre: 'ASC' },
     });
-  }
+  }*/
 
   async findOne(id: number): Promise<Producto> {
     const producto = await this.productosRepository.findOne({

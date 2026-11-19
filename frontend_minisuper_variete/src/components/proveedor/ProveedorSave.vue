@@ -34,7 +34,7 @@ watch(
         form.value = {
           nitCi: props.proveedor.nitCi ?? '',
           nombres: props.proveedor.nombres ?? '',
-          apellidos: props.proveedor.apellidos ?? '',
+          apellidos: props.proveedor.razonSocial ?? '',
           telefono: props.proveedor.telefono ?? '',
           direccion: props.proveedor.direccion ?? '',
           email: props.proveedor.email ?? '',

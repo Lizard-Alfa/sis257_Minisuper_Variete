@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import type { Categoria, Producto } from '@/models/producto'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import http from '@/plugins/axios'
-import { Button, Dialog, InputNumber, InputText, Select } from 'primevue'
+import { Button, Dialog, InputNumber, InputText, Select, DatePicker } from 'primevue'
+import type { Producto } from '@/models/producto'
+import type { Categoria } from '@/models/categoria'
+import type { Proveedor } from '@/models/proveedor'
 
 const ENDPOINT = 'productos'
-
-interface ProveedorOption {
-  id: number
-  nitCi: string
-  nombres: string
-  apellidos: string
-  nombreCompleto: string  // 👈 Agregado
-}
-
 const props = defineProps({
   mostrar: Boolean,
   producto: {
-    type: Object as () => Producto | null,
-    default: () => null,
+    type: Object as () => Producto,
+    default: () => ({}) as Producto,
   },
   modoEdicion: Boolean,
 })
 
 const emit = defineEmits(['guardar', 'close'])
 
-const form = ref({
-  codigo: '',
-  nombre: '',
-  precio: 0,
-  unidad_medida: '',
-  idCategoria: null as number | null,
-  nitCiProveedor: '',
-  imagen_url: '',
-})
+const producto = ref<Producto>({
+  ...(props.producto || {}),
+  categoria: props.producto?.categoria ?? { id: 0 },
+  proveedor: props.producto?.proveedor ?? { id: 0 },
+} as Producto)
+
+watch(
+  () => props.producto,
+  (newVal) => {
+    producto.value = {
+      ...(newVal || {}),
+      categoria: newVal?.categoria ?? { id: 0 },
+      proveedor: newVal?.proveedor ?? { id: 0 },
+    } as Producto
+  },
+)
 
 const categorias = ref<Categoria[]>([])
-const proveedores = ref<ProveedorOption[]>([])
+const proveedores = ref<Proveedor[]>([])
 
 const unidadesMedida = [
   { label: 'Unidad', value: 'Unidad' },
@@ -49,56 +49,37 @@ const unidadesMedida = [
   { label: 'Paquete', value: 'Paquete' },
 ]
 
-async function cargarCategorias() {
-  categorias.value = await http.get('categorias').then((r) => r.data)
+async function obtenerCategorias() {
+  categorias.value = await http.get('categorias').then((res) => res.data)
 }
 
-async function cargarProveedores() {
-  const data = await http.get('proveedores').then((r) => r.data)
-  proveedores.value = data.map((p: any) => ({
-    ...p,
-    nombreCompleto: `${p.nombres} ${p.apellidos}`.trim(),
-  }))
+async function obtenerProveedores() {
+  proveedores.value = await http.get('proveedores').then((res) => res.data)
 }
 
 watch(
   () => props.mostrar,
-  async (visible) => {
-    if (visible) {
-      await Promise.all([cargarCategorias(), cargarProveedores()])
-      if (props.modoEdicion && props.producto) {
-        // 👇 La propiedad 'imagen_url' no existe en el tipo 'Producto'.
-        const precioNum = typeof props.producto.precio === 'string'
-          ? parseFloat(props.producto.precio)
-          : props.producto.precio
+  (nuevoValor) => {
+    if (nuevoValor) {
+      obtenerCategorias()
+      obtenerProveedores()
 
-        form.value = {
-          codigo: props.producto.codigo ?? '',
-          nombre: props.producto.nombre ?? '',
-          precio: precioNum ?? 0,
-          unidad_medida: props.producto.unidad_medida ?? '',
-          idCategoria: props.producto.categoria?.id ?? null,
-          nitCiProveedor: props.producto.proveedor?.nitCi ?? '',
-          imagen_url: props.producto.imagen_url ?? '',
+      if (props.producto?.id) {
+        producto.value = {
+          ...props.producto,
+          categoria: props.producto.categoria ?? { id: 0 },
+          proveedor: props.producto.proveedor ?? { id: 0 },
         }
       } else {
-        resetForm()
+        producto.value = {
+          id: 0,
+          categoria: { id: 0 },
+          proveedor: { id: 0 },
+        } as unknown as Producto
       }
     }
   },
 )
-
-function resetForm() {
-  form.value = {
-    codigo: '',
-    nombre: '',
-    precio: 0,
-    unidad_medida: '',
-    idCategoria: null,
-    nitCiProveedor: '',
-    imagen_url: '',
-  }
-}
 
 const dialogVisible = computed({
   get: () => props.mostrar,
@@ -109,60 +90,53 @@ const dialogVisible = computed({
 
 async function handleSave() {
   try {
-    if (!form.value.codigo?.trim()) {
+    if (!producto.value.codigo) {
       alert('El código es obligatorio')
       return
     }
-    if (!form.value.nombre?.trim()) {
+    if (!producto.value.nombre) {
       alert('El nombre es obligatorio')
       return
     }
-    if (!form.value.idCategoria) {
+    if (!producto.value.categoria?.id) {
       alert('Debe seleccionar una categoría')
       return
     }
-    if (!form.value.nitCiProveedor) {
-      alert('Debe seleccionar un proveedor')
-      return
-    }
-    if (form.value.precio <= 0) {
+    if (producto.value.precio <= 0) {
       alert('El precio debe ser mayor a 0')
       return
     }
-    if (!form.value.unidad_medida?.trim()) {
+    if (!producto.value.unidadMedida) {
       alert('La unidad de medida es obligatoria')
       return
     }
 
-    const body: any = {
-      codigo: form.value.codigo.trim(),
-      nombre: form.value.nombre.trim(),
-      precio: Number(form.value.precio),
-      unidad_medida: form.value.unidad_medida.trim(),
-      idCategoria: form.value.idCategoria,
-      nitCiProveedor: form.value.nitCiProveedor,
+    const body = {
+      codigo: producto.value.codigo,
+      nombre: producto.value.nombre,
+      idCategoria: producto.value.categoria?.id,
+      idProveedor: producto.value.proveedor?.id,
+      imagen: producto.value.imagen,
+      unidadMedida: producto.value.unidadMedida,
+      stock: Number(producto.value.stock),
+      stockMinimo: Number(producto.value.stockMinimo),
+      precio: Number(producto.value.precio),
+      precioDescuento: Number(producto.value.precioDescuento),
+      descuentoInicio: producto.value.descuentoInicio||null,
+      descuentoFin: producto.value.descuentoFin||null,
     }
 
-    if (form.value.imagen_url?.trim()) {
-      body.imagen_url = form.value.imagen_url.trim()
-    }
-
-    if (props.modoEdicion && props.producto) {
-      await http.patch(`${ENDPOINT}/${props.producto.id}`, body)
+    if (props.modoEdicion && producto.value.id) {
+      await http.patch(`${ENDPOINT}/${producto.value.id}`, body)
     } else {
       await http.post(ENDPOINT, body)
     }
 
     emit('guardar')
-    resetForm()
+    producto.value = {} as Producto
     dialogVisible.value = false
   } catch (error: any) {
-    const mensaje =
-      error?.response?.data?.message ||
-      (Array.isArray(error?.response?.data?.message)
-        ? error.response.data.message.join(', ')
-        : 'Error al guardar el producto')
-    alert(mensaje)
+    alert(error?.response?.data?.message)
   }
 }
 </script>
@@ -181,20 +155,14 @@ async function handleSave() {
             <label for="codigo" class="font-semibold">Código *</label>
             <InputText
               id="codigo"
-              v-model="form.codigo"
-              maxlength="10"
+              v-model="producto.codigo"
+              maxlength="20"
               autocomplete="off"
-              autofocus
             />
           </div>
           <div class="flex flex-column gap-2 flex-2">
             <label for="nombre" class="font-semibold">Nombre *</label>
-            <InputText
-              id="nombre"
-              v-model="form.nombre"
-              maxlength="100"
-              autocomplete="off"
-            />
+            <InputText id="nombre" v-model="producto.nombre" maxlength="100" autocomplete="off" />
           </div>
         </div>
 
@@ -203,7 +171,7 @@ async function handleSave() {
             <label for="categoria" class="font-semibold">Categoría *</label>
             <Select
               id="categoria"
-              v-model="form.idCategoria"
+              v-model="producto.categoria.id"
               :options="categorias"
               optionLabel="nombre"
               optionValue="id"
@@ -212,23 +180,65 @@ async function handleSave() {
             />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="proveedor" class="font-semibold">Proveedor *</label>
+            <label for="proveedor" class="font-semibold">Proveedor (opcional)</label>
             <Select
               id="proveedor"
-              v-model="form.nitCiProveedor"
+              v-model="producto.proveedor.id"
               :options="proveedores"
-              optionLabel="nombreCompleto"
-              optionValue="nitCi"
+              optionLabel="nombres"
+              optionValue="id"
               placeholder="Seleccione un proveedor"
               class="w-full"
-            >
-              <template #option="slotProps">
-                <span>
-                  {{ slotProps.option.nombres }} {{ slotProps.option.apellidos }}
-                  <small class="text-color-secondary">({{ slotProps.option.nitCi }})</small>
-                </span>
-              </template>
-            </Select>
+            />
+          </div>
+        </div>
+
+        <div class="flex flex-column gap-2">
+          <label for="imagen" class="font-semibold">URL de Imagen (opcional)</label>
+          <InputText
+            id="imagen"
+            v-model="producto.imagen"
+            placeholder="https://ejemplo.com/imagen.jpg"
+            autocomplete="off"
+          />
+          <small v-if="producto.imagen" class="text-color-secondary">
+            Vista previa:
+            <img
+              :src="producto.imagen"
+              alt="Vista previa"
+              style="
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 4px;
+                margin-top: 5px;
+              "
+              @error="($event.target as HTMLImageElement).style.display = 'none'"
+            />
+          </small>
+        </div>
+
+        <div class="flex flex-column gap-2 flex-1">
+          <label for="unidadMedida" class="font-semibold">Unidad de Medida *</label>
+          <Select
+            id="unidadMedida"
+            v-model="producto.unidadMedida"
+            :options="unidadesMedida"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Seleccione una unidad"
+            class="w-full"
+          />
+        </div>
+
+        <div class="flex gap-3">
+          <div class="flex flex-column gap-2 flex-1">
+            <label for="stock" class="font-semibold">Stock *</label>
+            <InputNumber id="stock" v-model="producto.stock" class="w-full" :min="0" />
+          </div>
+          <div class="flex flex-column gap-2 flex-1">
+            <label for="stockMinimo" class="font-semibold">Stock Mínimo *</label>
+            <InputNumber id="stockMinimo" v-model="producto.stockMinimo" class="w-full" :min="0" />
           </div>
         </div>
 
@@ -237,7 +247,7 @@ async function handleSave() {
             <label for="precio" class="font-semibold">Precio (Bs.) *</label>
             <InputNumber
               id="precio"
-              v-model="form.precio"
+              v-model="producto.precio"
               mode="decimal"
               :minFractionDigits="2"
               :maxFractionDigits="2"
@@ -247,36 +257,46 @@ async function handleSave() {
             />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="unidad" class="font-semibold">Unidad de Medida *</label>
-            <Select
-              id="unidad"
-              v-model="form.unidad_medida"
-              :options="unidadesMedida"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="Seleccione una unidad"
+            <label for="precioDescuento" class="font-semibold">Precio con Descuento</label>
+            <InputNumber
+              id="precioDescuento"
+              v-model="producto.precioDescuento"
+              mode="decimal"
+              :minFractionDigits="2"
+              :maxFractionDigits="2"
+              :min="0"
+              locale="es-BO"
               class="w-full"
             />
           </div>
         </div>
 
-        <div class="flex flex-column gap-2">
-          <label for="imagen_url" class="font-semibold">URL de Imagen (opcional)</label>
-          <InputText
-            id="imagen_url"
-            v-model="form.imagen_url"
-            placeholder="https://ejemplo.com/imagen.jpg"
-            autocomplete="off"
-          />
-          <small v-if="form.imagen_url" class="text-color-secondary">
-            Vista previa:
-            <img
-              :src="form.imagen_url"
-              alt="Vista previa"
-              style="width: 80px; height: 80px; object-fit: cover; border-radius: 4px; margin-top: 5px;"
-              @error="($event.target as HTMLImageElement).style.display = 'none'"
+        <!-- Fechas de descuento -->
+        <div class="flex gap-3">
+          <div class="flex flex-column gap-2 flex-1">
+            <label for="descuentoInicio" class="font-semibold">Fecha Inicio Descuento</label>
+            <DatePicker
+              id="descuentoInicio"
+              v-model="producto.descuentoInicio"
+              dateFormat="yy-mm-dd"
+              showIcon
+              showClearButton
+              placeholder="Seleccione fecha"
+              class="w-full"
             />
-          </small>
+          </div>
+          <div class="flex flex-column gap-2 flex-1">
+            <label for="descuentoFin" class="font-semibold">Fecha Fin Descuento</label>
+            <DatePicker
+              id="descuentoFin"
+              v-model="producto.descuentoFin"
+              dateFormat="yy-mm-dd"
+              showIcon
+              showClearButton
+              placeholder="Seleccione fecha"
+              class="w-full"
+            />
+          </div>
         </div>
       </div>
 
@@ -296,15 +316,15 @@ async function handleSave() {
 
 <style scoped>
 :deep(.p-select-label) {
-  color: #fff !important;
+  color: #131313 !important;
 }
 :deep(.p-select-option) {
   color: #413f3f !important;
 }
 :deep(.p-inputtext) {
-  color: #fff !important;
+  color: #121212 !important;
 }
 :deep(.p-inputnumber-input) {
-  color: #fff !important;
+  color: #0c0c0c !important;
 }
 </style>

@@ -1,37 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Cliente } from './entities/cliente.entity';
 import { CreateClienteDto } from './dto/create-cliente.dto';
 import { UpdateClienteDto } from './dto/update-cliente.dto';
-import { Like } from 'typeorm';
 
 @Injectable()
 export class ClientesService {
-  constructor(@InjectRepository(Cliente) private clientesRepo: Repository<Cliente>) {}
+  constructor(
+    @InjectRepository(Cliente) private readonly clientesRepo: Repository<Cliente>,
+  ) {}
 
-  create(dto: CreateClienteDto) {
+  async create(dto: CreateClienteDto): Promise<Cliente> {
     const cliente = this.clientesRepo.create(dto);
     return this.clientesRepo.save(cliente);
   }
 
-  findAll() {
-    return this.clientesRepo.find();
+  async findAll(): Promise<Cliente[]> {
+    return this.clientesRepo.find({ order: { id: 'ASC' } });
   }
 
-  findOne(clienteCi: string) {
-    return this.clientesRepo.findOneBy({ clienteCi });
+  async findOne(clienteCi: string): Promise<Cliente> {
+    const cliente = await this.clientesRepo.findOneBy({ clienteCi });
+    if (!cliente) {
+      throw new NotFoundException(`Cliente con CI ${clienteCi} no encontrado`);
+    }
+    return cliente;
   }
 
-  update(clienteCi: string, dto: UpdateClienteDto) {
-    return this.clientesRepo.update({ clienteCi }, dto);
+  async update(clienteCi: string, dto: UpdateClienteDto): Promise<Cliente> {
+    const cliente = await this.findOne(clienteCi);
+    Object.assign(cliente, dto);
+    return this.clientesRepo.save(cliente);
   }
 
-  remove(clienteCi: string) {
-    return this.clientesRepo.delete({ clienteCi });
+  async remove(clienteCi: string): Promise<void> {
+    const cliente = await this.findOne(clienteCi);
+    await this.clientesRepo.remove(cliente);
   }
 
-  async buscarPorCi(ci: string) {
+  async buscarPorCi(ci: string): Promise<Cliente[]> {
     return this.clientesRepo.find({
       where: { clienteCi: Like(`%${ci}%`) },
       take: 10,

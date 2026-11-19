@@ -15,7 +15,6 @@ const emit = defineEmits(['edit'])
 
 async function obtenerLista() {
   proveedores.value = await http.get(ENDPOINT).then((response) => response.data)
-  paginaActual.value = 1
 }
 
 const proveedoresFiltrados = computed(() => {
@@ -23,7 +22,7 @@ const proveedoresFiltrados = computed(() => {
   return proveedores.value.filter(
     (proveedor) =>
       proveedor.nombres.toLowerCase().includes(termino) ||
-      proveedor.apellidos.toLowerCase().includes(termino) ||
+      proveedor.razonSocial.toLowerCase().includes(termino) ||
       proveedor.nitCi.toLowerCase().includes(termino) ||
       proveedor.email.toLowerCase().includes(termino) ||
       proveedor.telefono.toLowerCase().includes(termino),
@@ -65,10 +64,6 @@ async function eliminar() {
   mostrarConfirmDialog.value = false
 }
 
-function nombreCompleto(proveedor: Proveedor): string {
-  return `${proveedor.nombres} ${proveedor.apellidos}`.trim()
-}
-
 onMounted(() => {
   obtenerLista()
 })
@@ -93,6 +88,7 @@ defineExpose({ obtenerLista })
           <th>Nro.</th>
           <th>NIT/CI</th>
           <th>Nombre Completo</th>
+          <th>Razon Social</th>
           <th>Teléfono</th>
           <th>Dirección</th>
           <th>Email</th>
@@ -103,7 +99,8 @@ defineExpose({ obtenerLista })
         <tr v-for="(proveedor, index) in proveedoresPaginados" :key="proveedor.id">
           <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
           <td><Tag :value="proveedor.nitCi" severity="info" /></td>
-          <td>{{ nombreCompleto(proveedor) }}</td>
+          <td>{{ proveedor.nombres }}</td>
+            <td>{{ proveedor.razonSocial }}</td>
           <td>{{ proveedor.telefono }}</td>
           <td>{{ proveedor.direccion }}</td>
           <td>{{ proveedor.email }}</td>
@@ -159,7 +156,7 @@ defineExpose({ obtenerLista })
     </div>
 
     <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Eliminación" :style="{ width: '25rem' }">
-      <p>¿Estás seguro de que deseas eliminar al proveedor <strong>{{ proveedorDelete ? nombreCompleto(proveedorDelete) : '' }}</strong>?</p>
+      <p>¿Estás seguro de que deseas eliminar al proveedor <strong>{{ proveedorDelete?.nombres}}</strong>?</p>
       <div class="flex justify-end gap-2">
         <Button type="button" label="Cancelar" severity="secondary" @click="mostrarConfirmDialog = false" />
         <Button type="button" label="Eliminar" severity="danger" @click="eliminar" />

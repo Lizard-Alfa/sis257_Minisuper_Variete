@@ -6,8 +6,8 @@ import { ref } from 'vue'
 import type { Producto } from '@/models/producto'
 
 const mostrarDialog = ref<boolean>(false)
-const productoListRef = ref<InstanceType<typeof ProductoList> | null>(null)
-const productoEdit = ref<Producto | null>(null)
+const productoListRef = ref<typeof ProductoList | null>(null)
+const productoEdit = ref<any>(null)
 
 function handleCreate() {
   productoEdit.value = null
@@ -29,7 +29,7 @@ function handleCloseDialog() {
 </script>
 
 <template>
-  <section class="section" data-section="section-productos">
+  <section class="section" data-section="section6">
     <div class="container">
       <div class="row pt-4 mt-4">
         <div class="col-md-12">
