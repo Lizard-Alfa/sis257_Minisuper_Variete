@@ -15,7 +15,7 @@ export interface VentaDetalle {
 export interface Venta {
   id: number
   transaccion: string
-  idTrabajador: number
+  idUsuario: number
   idCliente: number
   metodoPago: string
   observaciones: string | null
@@ -23,7 +23,7 @@ export interface Venta {
   total: string
   estado: 'activa' | 'anulada'
   fechaCreacion: string
-  trabajador: { id: number; nombres: string; apellidos: string }
+  usuario: { id: number; usuario: string }
   cliente: Cliente
   detalles?: VentaDetalle[]
 }

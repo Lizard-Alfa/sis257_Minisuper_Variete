@@ -35,8 +35,8 @@ const proveedoresPaginados = computed(() => {
   return proveedoresFiltrados.value.slice(inicio, fin)
 })
 
-const totalPaginas = computed(() =>
-  Math.ceil(proveedoresFiltrados.value.length / filasPorPagina.value) || 1,
+const totalPaginas = computed(
+  () => Math.ceil(proveedoresFiltrados.value.length / filasPorPagina.value) || 1,
 )
 
 function cambiarPagina(pagina: number) {
@@ -100,12 +100,17 @@ defineExpose({ obtenerLista })
           <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
           <td><Tag :value="proveedor.nitCi" severity="info" /></td>
           <td>{{ proveedor.nombres }}</td>
-            <td>{{ proveedor.razonSocial }}</td>
+          <td>{{ proveedor.razonSocial }}</td>
           <td>{{ proveedor.telefono }}</td>
           <td>{{ proveedor.direccion }}</td>
           <td>{{ proveedor.email }}</td>
           <td>
-            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(proveedor)" />
+            <Button
+              icon="pi pi-pencil"
+              aria-label="Editar"
+              text
+              @click="emitirEdicion(proveedor)"
+            />
             <Button
               icon="pi pi-trash"
               aria-label="Eliminar"
@@ -155,10 +160,23 @@ defineExpose({ obtenerLista })
       </nav>
     </div>
 
-    <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Eliminación" :style="{ width: '25rem' }">
-      <p>¿Estás seguro de que deseas eliminar al proveedor <strong>{{ proveedorDelete?.nombres}}</strong>?</p>
+    <Dialog
+      v-model:visible="mostrarConfirmDialog"
+      header="Confirmar Eliminación"
+      :style="{ width: '25rem' }"
+    >
+      <p>
+        ¿Estás seguro de que deseas eliminar al proveedor
+        <strong>{{ proveedorDelete?.nombres }}</strong
+        >?
+      </p>
       <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancelar" severity="secondary" @click="mostrarConfirmDialog = false" />
+        <Button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          @click="mostrarConfirmDialog = false"
+        />
         <Button type="button" label="Eliminar" severity="danger" @click="eliminar" />
       </div>
     </Dialog>

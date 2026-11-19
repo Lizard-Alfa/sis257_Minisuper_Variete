@@ -28,14 +28,19 @@ function closeMenu() {
   <div class="header_section">
     <div class="container">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="index.html"><img src="/images/logo.png"></a>
-        <button class="navbar-toggler" type="button" @click="toggleMenu" aria-controls="navbarSupportedContent"
-          :aria-expanded="menuOpen" aria-label="Toggle navigation">
+        <a class="navbar-brand" href="index.html"><img src="/images/logo.png" /></a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          @click="toggleMenu"
+          aria-controls="navbarSupportedContent"
+          :aria-expanded="menuOpen"
+          aria-label="Toggle navigation"
+        >
           <span class="navbar-toggler-icon"></span>
         </button>
         <div :class="['collapse navbar-collapse', { show: menuOpen }]" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto">
-
             <!-- Enlaces públicos -->
             <li class="nav-item active">
               <RouterLink to="/" class="nav-link" @click="closeMenu">Inicio</RouterLink>
@@ -47,16 +52,27 @@ function closeMenu() {
             <!-- Enlaces admin -->
             <template v-if="isAdmin">
               <li class="nav-item">
-                <RouterLink to="/productos" class="nav-link" @click="closeMenu">Productos</RouterLink>
+                <RouterLink to="/productos" class="nav-link" @click="closeMenu"
+                  >Productos</RouterLink
+                >
               </li>
               <li class="nav-item">
-                <RouterLink to="/proveedores" class="nav-link" @click="closeMenu">Proveedores</RouterLink>
+                <RouterLink to="/proveedores" class="nav-link" @click="closeMenu"
+                  >Proveedores</RouterLink
+                >
               </li>
               <li class="nav-item">
                 <RouterLink to="/clientes" class="nav-link" @click="closeMenu">Clientes</RouterLink>
               </li>
               <li class="nav-item">
-                <RouterLink to="/ventas" class="nav-link" @click="closeMenu">Punto de Venta</RouterLink>
+                <RouterLink to="/ventas/nueva" class="nav-link" @click="closeMenu"
+                  >Punto de Venta</RouterLink
+                >
+              </li>
+              <li class="nav-item">
+                <RouterLink to="/ventas" class="nav-link" @click="closeMenu"
+                  >Historial de venta</RouterLink
+                >
               </li>
             </template>
           </ul>
@@ -77,7 +93,6 @@ function closeMenu() {
     </div>
   </div>
   <!-- header section end -->
-
 </template>
 
 <style scoped></style>

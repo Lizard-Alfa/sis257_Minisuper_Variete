@@ -16,11 +16,9 @@ async function obtenerLista() {
   categorias.value = await http.get(ENDPOINT).then((response) => response.data)
 }
 
-
 const categoriasFiltradas = computed(() => {
-  return categorias.value.filter(
-    (categoria) =>
-      categoria.nombre.toLowerCase().includes(busqueda.value.toLowerCase()),
+  return categorias.value.filter((categoria) =>
+    categoria.nombre.toLowerCase().includes(busqueda.value.toLowerCase()),
   )
 })
 
@@ -66,7 +64,12 @@ defineExpose({ obtenerLista })
           <td>{{ index + 1 }}</td>
           <td>{{ categoria.nombre }}</td>
           <td>
-            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(categoria)" />
+            <Button
+              icon="pi pi-pencil"
+              aria-label="Editar"
+              text
+              @click="emitirEdicion(categoria)"
+            />
             <Button
               icon="pi pi-trash"
               aria-label="Eliminar"

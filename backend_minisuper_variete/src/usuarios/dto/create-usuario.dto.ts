@@ -12,10 +12,6 @@ import {
 } from 'class-validator';
 
 export class CreateUsuarioDto {
-  @ApiProperty()
-  @IsDefined({ message: 'El id del trabajador  es obligatorio' })
-  @IsInt({ message: 'El id del trabajador debe ser tipo numérico' })
-  readonly idTrabajador: number;
 
   @ApiProperty()
   @IsNotEmpty({ message: 'El usuario es obligatorio' })

@@ -8,8 +8,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Usuario } from '../../usuarios/entities/usuario.entity';
-import { Venta } from '../../ventas/entities/venta.entity';
+
 
 @Entity('trabajadores')
 export class Trabajador {
@@ -40,8 +39,4 @@ export class Trabajador {
   @DeleteDateColumn({ name: 'fecha_eliminacion' })
   fechaEliminacion: Date;
 
-  @OneToOne(() => Usuario, usuarios => usuarios.trabajador)
-  usuarios: Usuario;
-  @OneToMany(() => Venta, venta => venta.trabajador)
-  ventas: Venta[];
 }

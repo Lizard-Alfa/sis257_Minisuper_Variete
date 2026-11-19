@@ -4,6 +4,8 @@
 
 El sistema está diseñado para la administración integral de un minisúper dedicado a la venta de productos de consumo diario (alimentos, bebidas, artículos de limpieza y hogar).
 
+Permite administrar el catálogo de productos por categorías, gestionar proveedores y clientes, controlar el inventario en tiempo real y registrar tanto el proceso de ventas en caja como el abastecimiento mediante compras.
+
 ---
 
 # Modelo de Base de Datos - Sistema de Ventas
@@ -17,75 +19,67 @@ Este documento describe la estructura del modelo entidad-relación del sistema, 
 ## Entidades y atributos
 
 **Categoria**
-- id (autogenerado, PK)
-- nombre (cadena 50) — OBLIGATORIO
+- nombre (PK)
+- id (autogenerado)
 
 **Proveedor**
-- id (autogenerado, PK)
-- nitCi (cadena 15) — OBLIGATORIO
-- nombres (cadena 50) — OBLIGATORIO
-- razonSocial (cadena 50) — OPCIONAL
-- telefono (cadena 20) — OPCIONAL
-- direccion (cadena 100) — OPCIONAL
-- email (cadena 100) — OPCIONAL
+- nit_ci (PK)
+- id (autogenerado)
+- nombres
+- apellidos
+- telefono
+- direccion
+- email
 
 **Productos**
-- id (autogenerado, PK)
-- codigo (cadena 20) — OBLIGATORIO
-- nombre (cadena 100) — OBLIGATORIO
-- idCategoria (entero, FK → Categoria) — OBLIGATORIO
-- idProveedor (entero, FK → Proveedor) — OPCIONAL
-- imagen (cadena 500) — OPCIONAL
-- unidadMedida (cadena 50) — OBLIGATORIO
-- stock (entero) — OBLIGATORIO (puede ser 0)
-- stockMinimo (entero) — OBLIGATORIO (puede ser 0)
-- precioVenta (decimal) — OBLIGATORIO
-- precioDescuento (decimal) — OPCIONAL (0 = sin descuento)
-- descuentoInicio (fecha) — OPCIONAL
-- descuentoFin (fecha) — OPCIONAL
+- codigo (PK)
+- id (autogenerado)
+- nombre_categoria (FK → Categoria)
+- nit_ci_proveedor (FK → Proveedor)
+- nombre
+- imagen
+- unidad_medida
+- precio
+- estado
 
 **Cliente**
-- id (autogenerado, PK)
-- nitCi (cadena 15) — OPCIONAL
-- nombres (cadena 50) — OBLIGATORIO
-- apellidos (cadena 50) — OPCIONAL
-- telefono (cadena 15) — OPCIONAL
+- ci_nit (PK)
+- nombres
+- apellidos
 
 **Trabajadores**
-- id (autogenerado, PK)
-- ci (cadena 15) — OBLIGATORIO
-- nombres (cadena 50) — OBLIGATORIO
-- apellidos (cadena 50) — OBLIGATORIO
-- telefono (cadena 20) — OPCIONAL
-- direccion (cadena 50) — OPCIONAL
+- ci (PK)
+- id (autogenerado)
+- nombres
+- apellidos
+- telefono
+- direccion
 
 **Usuario**
-- id (autogenerado, PK)
-- idTrabajador (entero, FK → Trabajadores) — OBLIGATORIO
-- usuario (cadena 12) — OBLIGATORIO
-- clave (cadena 225) — OBLIGATORIO
-- email (cadena 50) — OPCIONAL
-- rol (cadena 15) — OBLIGATORIO
+- usuario (PK)
+- ci_trabajador (FK → Trabajadores)
+- id (autogenerado)
+- contraseña
 
 **Ventas**
-- id (autogenerado, PK)
-- transaccion (cadena 15) — OBLIGATORIO
-- idTrabajador (entero, FK → Trabajadores) — OBLIGATORIO
-- idCliente (entero, FK → Cliente) — OBLIGATORIO
-- metodoPago (cadena 15) — OBLIGATORIO
-- observaciones (cadena 50) — OPCIONAL
-- subtotal (decimal) — OBLIGATORIO
-- total (decimal) — OBLIGATORIO
-- estado (cadena: activa/anulada) — OBLIGATORIO
+- numero_venta (PK)
+- id (autogenerado)
+- ci_trabajador (FK → Trabajadores)
+- ci_nit_cliente (FK → Cliente)
+- descuento
+- sub_total
+- metodo_pago
+- total
+- fecha_venta
 
 **VentaDetalles**
-- id (autogenerado, PK)
-- idVenta (entero, FK → Ventas) — OBLIGATORIO
-- idProducto (entero, FK → Productos) — OBLIGATORIO
-- cantidad (entero) — OBLIGATORIO
-- descuentoMonto (decimal) — OPCIONAL
-- precioUnitario (decimal) — OBLIGATORIO
-- subtotal (decimal) — OBLIGATORIO
+- id (PK, autogenerado)
+- numero_venta (FK → Ventas)
+- codigo_producto (FK → Productos)
+- cantidad
+- precio_unitario
+- sub_total
+- fecha
 
 ## Relaciones
 

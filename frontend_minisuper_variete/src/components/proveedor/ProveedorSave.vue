@@ -137,45 +137,24 @@ async function handleSave() {
       <div class="flex flex-column gap-3">
         <div class="flex flex-column gap-2">
           <label for="nitCi" class="font-semibold">NIT / CI *</label>
-          <InputText
-            id="nitCi"
-            v-model="form.nitCi"
-            maxlength="20"
-            autocomplete="off"
-            autofocus
-          />
+          <InputText id="nitCi" v-model="form.nitCi" maxlength="20" autocomplete="off" autofocus />
         </div>
 
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="nombres" class="font-semibold">Nombres *</label>
-            <InputText
-              id="nombres"
-              v-model="form.nombres"
-              maxlength="50"
-              autocomplete="off"
-            />
+            <InputText id="nombres" v-model="form.nombres" maxlength="50" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
             <label for="apellidos" class="font-semibold">Apellidos *</label>
-            <InputText
-              id="apellidos"
-              v-model="form.apellidos"
-              maxlength="50"
-              autocomplete="off"
-            />
+            <InputText id="apellidos" v-model="form.apellidos" maxlength="50" autocomplete="off" />
           </div>
         </div>
 
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="telefono" class="font-semibold">Teléfono *</label>
-            <InputText
-              id="telefono"
-              v-model="form.telefono"
-              maxlength="20"
-              autocomplete="off"
-            />
+            <InputText id="telefono" v-model="form.telefono" maxlength="20" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
             <label for="email" class="font-semibold">Email *</label>
@@ -191,12 +170,7 @@ async function handleSave() {
 
         <div class="flex flex-column gap-2">
           <label for="direccion" class="font-semibold">Dirección *</label>
-          <InputText
-            id="direccion"
-            v-model="form.direccion"
-            maxlength="50"
-            autocomplete="off"
-          />
+          <InputText id="direccion" v-model="form.direccion" maxlength="50" autocomplete="off" />
         </div>
       </div>
 

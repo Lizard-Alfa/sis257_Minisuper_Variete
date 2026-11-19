@@ -133,7 +133,7 @@ defineExpose({ obtenerLista })
           <td>{{ v.transaccion }}</td>
           <td>{{ formatoFecha(v.fechaCreacion) }}</td>
           <td>{{ v.cliente?.nombres }}</td>
-          <td>{{ v.trabajador?.nombres }} {{ v.trabajador?.apellidos }}</td>
+          <td>{{ v.usuario?.usuario }}</td>
           <td class="text-capitalize">{{ v.metodoPago }}</td>
           <td>Bs {{ Number(v.total).toFixed(2) }}</td>
           <td>
@@ -176,7 +176,9 @@ defineExpose({ obtenerLista })
     >
       <div v-if="ventaDetalle">
         <div class="grid mb-3">
-          <div class="col-6"><strong>Fecha:</strong> {{ formatoFecha(ventaDetalle.fechaCreacion) }}</div>
+          <div class="col-6">
+            <strong>Fecha:</strong> {{ formatoFecha(ventaDetalle.fechaCreacion) }}
+          </div>
           <div class="col-6">
             <strong>Estado:</strong>
             <Tag
@@ -186,12 +188,10 @@ defineExpose({ obtenerLista })
             />
           </div>
           <div class="col-6"><strong>Cliente:</strong> {{ ventaDetalle.cliente?.nombres }}</div>
+          <div class="col-6"><strong>Vendedor:</strong> {{ ventaDetalle.usuario?.usuario }}</div>
           <div class="col-6">
-            <strong>Vendedor:</strong> {{ ventaDetalle.trabajador?.nombres }}
-            {{ ventaDetalle.trabajador?.apellidos }}
-          </div>
-          <div class="col-6">
-            <strong>Pago:</strong> <span class="text-capitalize">{{ ventaDetalle.metodoPago }}</span>
+            <strong>Pago:</strong>
+            <span class="text-capitalize">{{ ventaDetalle.metodoPago }}</span>
           </div>
           <div class="col-6" v-if="ventaDetalle.observaciones">
             <strong>Observaciones:</strong> {{ ventaDetalle.observaciones }}

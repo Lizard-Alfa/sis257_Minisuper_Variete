@@ -122,8 +122,8 @@ async function handleSave() {
       stockMinimo: Number(producto.value.stockMinimo),
       precio: Number(producto.value.precio),
       precioDescuento: Number(producto.value.precioDescuento),
-      descuentoInicio: producto.value.descuentoInicio||null,
-      descuentoFin: producto.value.descuentoFin||null,
+      descuentoInicio: producto.value.descuentoInicio || null,
+      descuentoFin: producto.value.descuentoFin || null,
     }
 
     if (props.modoEdicion && producto.value.id) {
@@ -153,12 +153,7 @@ async function handleSave() {
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="codigo" class="font-semibold">Código *</label>
-            <InputText
-              id="codigo"
-              v-model="producto.codigo"
-              maxlength="20"
-              autocomplete="off"
-            />
+            <InputText id="codigo" v-model="producto.codigo" maxlength="20" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-2">
             <label for="nombre" class="font-semibold">Nombre *</label>
