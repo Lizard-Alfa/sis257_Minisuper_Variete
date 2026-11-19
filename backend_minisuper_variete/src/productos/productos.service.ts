@@ -24,11 +24,11 @@ export class ProductosService {
     return this.productosRepository.save(producto);
   }
 
-async findAll() {
-  return await this.productosRepository.find({
-    relations: { categoria: true, proveedor: true }, // 👈 Esto obliga al backend a traer el objeto completo
-  });
-}
+  async findAll() {
+    return await this.productosRepository.find({
+      relations: { categoria: true, proveedor: true }, // 👈 Esto obliga al backend a traer el objeto completo
+    });
+  }
 
   /*async findByCategoria(idCategoria: number): Promise<Producto[]> {
     return this.productosRepository.find({

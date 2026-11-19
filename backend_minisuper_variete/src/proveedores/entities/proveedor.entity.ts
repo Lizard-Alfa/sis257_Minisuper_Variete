@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Producto } from '../../productos/entities/producto.entity';
+import { Venta } from '../../ventas/entities/venta.entity';
 
 @Entity('proveedores')
 export class Proveedor {
@@ -43,4 +44,6 @@ export class Proveedor {
 
   @OneToMany(() => Producto, producto => producto.proveedor)
   productos: Producto[];
+  @OneToMany(() => Venta, venta => venta.cliente)
+  ventas: Venta[];
 }

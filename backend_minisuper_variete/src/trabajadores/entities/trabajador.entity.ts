@@ -3,11 +3,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Usuario } from '../../usuarios/entities/usuario.entity';
+import { Venta } from '../../ventas/entities/venta.entity';
 
 @Entity('trabajadores')
 export class Trabajador {
@@ -40,4 +42,6 @@ export class Trabajador {
 
   @OneToOne(() => Usuario, usuarios => usuarios.trabajador)
   usuarios: Usuario;
+  @OneToMany(() => Venta, venta => venta.trabajador)
+  ventas: Venta[];
 }

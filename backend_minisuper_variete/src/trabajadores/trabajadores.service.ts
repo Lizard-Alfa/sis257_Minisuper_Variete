@@ -31,13 +31,13 @@ export class TrabajadoresService {
     return trabajador;
   }
 
-  async update(id: number, updateTrabajadoreDto: CreateTrabajadorDto):Promise<Trabajador> {
+  async update(id: number, updateTrabajadoreDto: CreateTrabajadorDto): Promise<Trabajador> {
     const trabajador = await this.findOne(id);
     Object.assign(trabajador, updateTrabajadoreDto);
     return this.trabajadoresRepository.save(trabajador);
   }
 
-  async remove(id: number) : Promise<Trabajador> {
+  async remove(id: number): Promise<Trabajador> {
     const trabajador = await this.findOne(id);
     return this.trabajadoresRepository.softRemove(trabajador);
   }

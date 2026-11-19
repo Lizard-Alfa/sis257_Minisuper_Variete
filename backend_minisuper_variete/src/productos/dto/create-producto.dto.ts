@@ -1,6 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsDefined, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import {
+  IsDateString,
+  IsDefined,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateProductoDto {
   @ApiProperty()
@@ -63,10 +73,10 @@ export class CreateProductoDto {
   @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString({}, { message: 'La fecha de descuento inicio debe ser de tipo fecha' })
-  descuentoInicio: Date| null;
+  descuentoInicio: Date | null;
 
   @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString({}, { message: 'La fecha de descuento final debe ser de tipo fecha' })
-  descuentoFin: Date|null;
+  descuentoFin: Date | null;
 }

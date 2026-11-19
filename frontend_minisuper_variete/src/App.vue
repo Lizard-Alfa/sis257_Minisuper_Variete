@@ -73,16 +73,16 @@ function closeMenu() {
                 <i class="bi bi-people"></i> Clientes
               </RouterLink>
             </li>
-            <!--         <li class="nav-item">
-              <RouterLink to="/ventas" class="nav-link" @click="closeMenu">
-                <i class="bi bi-cart"></i> Ventas
+            <li class="nav-item">
+              <RouterLink to="/ventas/nueva" class="nav-link" @click="closeMenu">
+                <i class="bi bi-people"></i> Punto de venta
               </RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink to="/historial-ventas" class="nav-link" @click="closeMenu">
-                <i class="bi bi-clock-history"></i> Historial
+              <RouterLink to="/ventas" class="nav-link" @click="closeMenu">
+                <i class="bi bi-receipt"></i> Ventas
               </RouterLink>
-            </li>-->
+            </li>
           </template>
         </ul>
 

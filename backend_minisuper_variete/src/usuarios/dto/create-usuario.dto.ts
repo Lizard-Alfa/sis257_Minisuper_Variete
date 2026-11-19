@@ -1,6 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsDefined, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsDefined,
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateUsuarioDto {
   @ApiProperty()
@@ -29,5 +38,4 @@ export class CreateUsuarioDto {
   @MaxLength(100, { message: 'El rol no puede tener más de 100 caracteres' })
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly rol: string;
-
 }

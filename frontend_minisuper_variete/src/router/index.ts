@@ -46,23 +46,21 @@ const router = createRouter({
       component: () => import('../views/ClientesView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true },
     },
-    /*{
-      path: '/historial-ventas',
-      name: 'historial-ventas',
-      component: () => import('../views/HistorialVentasView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
+    {
+      path: '/ventas/nueva',
+      name: 'ventas-nueva',
+      component: () => import('@/views/VentaNuevaView.vue'),
     },
     {
       path: '/ventas',
       name: 'ventas',
-      component: () => import('../views/VentasView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true },
-    },*/
+      component: () => import('@/views/VentaListView.vue'),
+    },
   ],
 })
 
 router.beforeEach(async (to) => {
-  const publicPages = [,'/catalogo','/login', '/']
+  const publicPages = [, '/catalogo', '/login', '/']
   const authRequired = !publicPages.includes(to.path)
   const authStore = useAuthStore()
 

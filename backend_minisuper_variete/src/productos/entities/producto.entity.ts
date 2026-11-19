@@ -5,11 +5,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Categoria } from '../../categorias/entities/categoria.entity';
 import { Proveedor } from '../../proveedores/entities/proveedor.entity';
+import { VentaDetalle } from '../../ventas/entities/venta-detalle.entity';
 
 @Entity('productos')
 export class Producto {
@@ -47,10 +49,10 @@ export class Producto {
   precioDescuento: number;
 
   @Column('date', { name: 'descuento_inicio', nullable: true })
-  descuentoInicio: Date|null;
+  descuentoInicio: Date | null;
 
   @Column('date', { name: 'descuento_fin', nullable: true })
-  descuentoFin: Date|null;
+  descuentoFin: Date | null;
 
   @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;
@@ -68,4 +70,6 @@ export class Producto {
   @ManyToOne(() => Proveedor, proveedor => proveedor.productos)
   @JoinColumn({ name: 'id_proveedor', referencedColumnName: 'id' })
   proveedor: Proveedor;
+  @OneToMany(() => VentaDetalle, detalle => detalle.producto)
+  ventaDetalles: VentaDetalle[];
 }

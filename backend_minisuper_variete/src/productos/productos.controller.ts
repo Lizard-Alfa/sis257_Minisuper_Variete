@@ -23,7 +23,7 @@ export class ProductosController {
     return this.productosService.findAll();
   }
 
- /*@Get('categoria/:id')
+  /*@Get('categoria/:id')
   findByCategoria(@Param('id') id: string) {
     return this.productosService.findByCategoria(+id);
   }
