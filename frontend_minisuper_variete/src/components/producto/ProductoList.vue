@@ -15,7 +15,6 @@ const emit = defineEmits(['edit'])
 
 async function obtenerLista() {
   productos.value = await http.get(ENDPOINT).then((response) => response.data)
-  paginaActual.value = 1
 }
 
 const productosFiltrados = computed(() => {
@@ -24,7 +23,7 @@ const productosFiltrados = computed(() => {
       producto.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
       producto.codigo.toLowerCase().includes(busqueda.value.toLowerCase()) ||
       producto.categoria.nombre.toLowerCase().includes(busqueda.value.toLowerCase()) ||
-      producto.proveedor.nombres.toLowerCase().includes(busqueda.value.toLowerCase())
+      producto.proveedor.nombres.toLowerCase().includes(busqueda.value.toLowerCase()),
   )
 })
 
@@ -34,8 +33,8 @@ const productosPaginados = computed(() => {
   return productosFiltrados.value.slice(inicio, fin)
 })
 
-const totalPaginas = computed(() =>
-  Math.ceil(productosFiltrados.value.length / filasPorPagina.value) || 1,
+const totalPaginas = computed(
+  () => Math.ceil(productosFiltrados.value.length / filasPorPagina.value) || 1,
 )
 
 function cambiarPagina(pagina: number) {
@@ -95,60 +94,69 @@ defineExpose({ obtenerLista })
       />
     </InputGroup>
 
-    <table class="table table-striped table-hover">
-      <thead class="table-dark">
-        <tr>
-          <th>Nro.</th>
-          <th>Imagen</th>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Categoría</th>
-          <th>Proveedor</th>
-          <th>Unidad de Medida</th>
-          <th>Precio</th>
-          <th>Precio con descuento</th>
-          <th>Descuento Inicio</th>
-          <th>Descuento Fin</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(producto, index) in productosPaginados" :key="producto.id">
-          <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
-          <td>
-            <img
-              :src="obtenerImagen(producto)"
-              :alt="producto.nombre"
-              style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;"
-            />
-          </td>
-          <td>{{ producto.codigo }}</td>
-          <td>{{ producto.nombre }}</td>
-          <td>{{ producto.categoria.nombre }}</td>
-          <td>{{producto.proveedor.nombres}}</td>
-          <td>{{producto.unidadMedida}}</td>
-          <td>{{producto.stock}}</td>
-          <td>{{producto.stockMinimo}}</td>
-          <td>{{producto.precio}}</td>
-          <td>{{producto.precioDescuento}}</td>
-          <td>{{producto.descuentoInicio}}</td>
-          <td>{{producto.descuentoFin}}</td>
-          <td>
-            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(producto)" />
-            <Button
-              icon="pi pi-trash"
-              aria-label="Eliminar"
-              text
-              severity="danger"
-              @click="mostrarEliminarConfirm(producto)"
-            />
-          </td>
-        </tr>
-        <tr v-if="productosPaginados.length === 0">
-          <td colspan="10" class="text-center">No se encontraron resultados</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle tabla-productos">
+        <thead class="table-dark">
+          <tr>
+            <th>Nro.</th>
+            <th>Imagen</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Proveedor</th>
+            <th>Unidad de Medida</th>
+            <th>Stock</th>
+            <th>Stock Mínimo</th>
+            <th>Precio</th>
+            <th>Precio con descuento</th>
+            <th>Descuento Inicio</th>
+            <th>Descuento Fin</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(producto, index) in productosPaginados" :key="producto.id">
+            <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
+            <td>
+              <img
+                :src="obtenerImagen(producto)"
+                :alt="producto.nombre"
+                style="width: 60px; height: 100px; object-fit: cover; border-radius: 4px"
+              />
+            </td>
+            <td>{{ producto.codigo }}</td>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.categoria?.nombre }}</td>
+            <td>{{ producto.proveedor?.nombres }}</td>
+            <td>{{ producto.unidadMedida }}</td>
+            <td>{{ producto.stock }}</td>
+            <td>{{ producto.stockMinimo }}</td>
+            <td>{{ producto.precio }}</td>
+            <td>{{ producto.precioDescuento }}</td>
+            <td>{{ producto.descuentoInicio }}</td>
+            <td>{{ producto.descuentoFin }}</td>
+            <td>
+              <Button
+                icon="pi pi-pencil"
+                aria-label="Editar"
+                text
+                @click="emitirEdicion(producto)"
+              />
+              <Button
+                icon="pi pi-trash"
+                aria-label="Eliminar"
+                text
+                severity="danger"
+                @click="mostrarEliminarConfirm(producto)"
+              />
+            </td>
+          </tr>
+          <tr v-if="productosPaginados.length === 0">
+            <td colspan="14" class="text-center">No se encontraron resultados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Paginar -->
     <div class="d-flex justify-content-between align-items-center mt-3">
@@ -184,13 +192,27 @@ defineExpose({ obtenerLista })
       </nav>
     </div>
 
-    <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Eliminación" :style="{ width: '25rem' }">
-      <p>¿Estás seguro de que deseas eliminar el producto <strong>{{ productoDelete?.nombre }}</strong>?</p>
-      <div class="flex justify-end gap-2">
-        <Button type="button" label="Cancelar" severity="secondary" @click="mostrarConfirmDialog = false" />
+    <Dialog
+      v-model:visible="mostrarConfirmDialog"
+      header="Confirmar Eliminación"
+      :style="{ width: '25rem' }"
+      modal
+    >
+      <p>
+        ¿Estás seguro de que deseas eliminar el producto
+        <strong>{{ productoDelete?.nombre }}</strong
+        >?
+      </p>
+      <div class="flex justify-end gap-2 mt-4">
+        <Button
+          type="button"
+          label="Cancelar"
+          severity="secondary"
+          @click="mostrarConfirmDialog = false"
+        />
         <Button type="button" label="Eliminar" severity="danger" @click="eliminar" />
       </div>
     </Dialog>
   </div>
 </template>
-<style> </style>
+<style></style>

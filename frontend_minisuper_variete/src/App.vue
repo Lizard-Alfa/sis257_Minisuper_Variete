@@ -28,7 +28,7 @@ function closeMenu() {
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container">
       <RouterLink to="/" class="navbar-brand fw-bold" @click="closeMenu">
-        Minisúper <span style="color: #f33f3f;">Variete</span>
+        Minisúper <span style="color: #f33f3f">Variete</span>
       </RouterLink>
 
       <button
@@ -73,7 +73,7 @@ function closeMenu() {
                 <i class="bi bi-people"></i> Clientes
               </RouterLink>
             </li>
- <!--         <li class="nav-item">
+            <!--         <li class="nav-item">
               <RouterLink to="/ventas" class="nav-link" @click="closeMenu">
                 <i class="bi bi-cart"></i> Ventas
               </RouterLink>

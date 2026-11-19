@@ -16,6 +16,7 @@ async function obtenerLista() {
   categorias.value = await http.get(ENDPOINT).then((response) => response.data)
 }
 
+
 const categoriasFiltradas = computed(() => {
   return categorias.value.filter(
     (categoria) =>

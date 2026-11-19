@@ -4,6 +4,7 @@ import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../auth/decorators/auth-public.decorator';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -17,6 +18,7 @@ export class ProductosController {
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.productosService.findAll();
   }

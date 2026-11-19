@@ -4,6 +4,7 @@ import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Public } from '../auth/decorators/auth-public.decorator';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('categorias')
@@ -16,6 +17,7 @@ export class CategoriasController {
   }
 
   @Get()
+  @Public()
   findAll() {
     return this.categoriasService.findAll();
   }

@@ -1,33 +1,32 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import http from '@/plugins/axios'
+import type { Producto } from '@/models/producto'
+import type { Categoria } from '@/models/categoria'
 
-interface Categoria { id: number; nombre: string }
-interface Producto {
-  id: number
-  codigo: string
-  nombre: string
-  precio: string | number
-  imagen_url?: string
-  categoria?: { id: number; nombre: string }
-}
-
-const productos = ref<Producto[]>([])
 const categorias = ref<Categoria[]>([])
 const categoriaActiva = ref<number | null>(null)
 
-onMounted(async () => {
-  const [prodRes, catRes] = await Promise.all([
-    http.get('productos'),
-    http.get('categorias')
-  ])
-  productos.value = prodRes.data
-  categorias.value = catRes.data
+const productos = ref<Producto[]>([])
+
+async function obtenerProductos() {
+  productos.value = await http.get('productos').then((response) => response.data)
+}
+
+// 1. Traer categorías igual que productos
+async function obtenerCategorias() {
+  categorias.value = await http.get('categorias').then((response) => response.data)
+}
+
+// 2. Filtrar los productos según el botón seleccionado
+const productosFiltrados = computed(() => {
+  if (categoriaActiva.value === null) return productos.value
+  return productos.value.filter((p) => p.categoria?.id === categoriaActiva.value)
 })
 
-const productosFiltrados = computed(() => {
-  if (!categoriaActiva.value) return productos.value
-  return productos.value.filter(p => p.categoria?.id === categoriaActiva.value)
+onMounted(() => {
+  obtenerProductos()
+  obtenerCategorias()
 })
 
 const placeholderImg = 'https://via.placeholder.com/300x200?text=Sin+Imagen'
@@ -66,10 +65,11 @@ const placeholderImg = 'https://via.placeholder.com/300x200?text=Sin+Imagen'
         </button>
       </div>
 
+      <!-- 3. Usar productosFiltrados en lugar de productos -->
       <div class="row">
         <div v-for="p in productosFiltrados" :key="p.id" class="col-md-3 col-sm-6 mb-4">
           <div class="product-item">
-            <img :src="p.imagen_url || placeholderImg" :alt="p.nombre" class="img-fluid" />
+            <img :src="p.imagen || placeholderImg" :alt="p.nombre" class="img-fluid" />
             <div class="down-content">
               <h4>{{ p.nombre }}</h4>
               <h6>Bs. {{ p.precio }}</h6>
@@ -87,7 +87,6 @@ const placeholderImg = 'https://via.placeholder.com/300x200?text=Sin+Imagen'
 </template>
 
 <style scoped>
-
 .product-item {
   border: 1px solid #eee;
   transition: all 0.3s;
