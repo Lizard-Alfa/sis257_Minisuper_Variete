@@ -80,7 +80,17 @@ watch(
     }
   },
 )
+const porcentajeDescuento = ref<number | null>(0)
+watch(
+  [() => producto.value.precio, porcentajeDescuento],
+  ([precio, descuento]) => {
+    const precioBase = Number(precio) || 0
+    const porcentaje = Number(descuento) || 0
 
+    producto.value.precioDescuento = precioBase - (precioBase * porcentaje) / 100
+  },
+  { immediate: false },
+)
 const dialogVisible = computed({
   get: () => props.mostrar,
   set: (value) => {
@@ -232,8 +242,15 @@ async function handleSave() {
             <InputNumber id="stock" v-model="producto.stock" class="w-full" :min="0" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="stockMinimo" class="font-semibold">Stock Mínimo *</label>
-            <InputNumber id="stockMinimo" v-model="producto.stockMinimo" class="w-full" :min="0" />
+            <label for="porcentajeDescuento" class="font-semibold"> Descuento (%) </label>
+            <InputNumber
+              id="porcentajeDescuento"
+              v-model="porcentajeDescuento"
+              suffix="%"
+              :min="0"
+              :max="100"
+              class="w-full"
+            />
           </div>
         </div>
 
@@ -252,16 +269,16 @@ async function handleSave() {
             />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="precioDescuento" class="font-semibold">Precio con Descuento</label>
+            <label for="precioDescuento" class="font-semibold"> Precio con Descuento </label>
             <InputNumber
               id="precioDescuento"
               v-model="producto.precioDescuento"
               mode="decimal"
               :minFractionDigits="2"
               :maxFractionDigits="2"
-              :min="0"
               locale="es-BO"
               class="w-full"
+              disabled
             />
           </div>
         </div>

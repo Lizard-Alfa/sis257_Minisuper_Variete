@@ -106,7 +106,7 @@ defineExpose({ obtenerLista })
             <th>Proveedor</th>
             <th>Unidad de Medida</th>
             <th>Stock</th>
-            <th>Stock Mínimo</th>
+            <th>Descuento(%)</th>
             <th>Precio</th>
             <th>Precio con descuento</th>
             <th>Descuento Inicio</th>

@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'guardar'): void
+  (e: 'guardar', cliente: Cliente): void
   (e: 'close'): void
 }>()
 
@@ -25,26 +25,19 @@ const form = ref({
 })
 
 watch(
-  () => props.cliente,
-  (nuevo) => {
-    if (nuevo) {
-      form.value = {
-        id: nuevo.id ?? 0,
-        nitCi: nuevo.nitCi ?? '',
-        nombres: nuevo.nombres ?? '',
-        apllidos: nuevo.apllidos ?? '',
-        telefono: nuevo.telefono ?? '',
-      }
-    } else {
-      form.value = {
-        id: 0,
-        nitCi: '',
-        nombres: '',
-        apllidos: '',
-        telefono: '',
-      }
+  [() => props.cliente, () => props.mostrar],
+  ([nuevo, mostrar]) => {
+    if (!mostrar) return
+
+    form.value = {
+      id: nuevo?.id ?? 0,
+      nitCi: nuevo?.nitCi ?? '',
+      nombres: nuevo?.nombres ?? '',
+      apllidos: nuevo?.apllidos ?? '',
+      telefono: nuevo?.telefono ?? '',
     }
   },
+  { immediate: true },
 )
 
 async function guardar() {
@@ -54,21 +47,12 @@ async function guardar() {
   }
 
   try {
-    const body = {
-      nitCi: form.value.nitCi,
-      nombres: form.value.nombres,
-      apllidos: form.value.apllidos,
-      telefono: form.value.telefono,
-    }
+    const { id, ...body } = form.value
+    const { data } = props.modoEdicion
+      ? await http.patch(`clientes/${id}`, body)
+      : await http.post('clientes', body)
 
-    if (props.modoEdicion) {
-      // Usamos el id numérico del cliente para actualizar por PATCH
-      await http.patch(`clientes/${form.value.id}`, body)
-    } else {
-      await http.post('clientes', body)
-    }
-
-    emit('guardar')
+    emit('guardar', data)
     emit('close')
   } catch (error: any) {
     alert(error?.response?.data?.message || 'Error al guardar')
@@ -82,8 +66,15 @@ async function guardar() {
     :header="modoEdicion ? 'Editar Cliente' : 'Nuevo Cliente'"
     :style="{ width: '30rem' }"
     modal
+    :closable="true"
+    @update:visible="
+      (valor) => {
+        if (!valor) emit('close')
+      }
+    "
     @hide="emit('close')"
   >
+    >
     <div class="flex flex-column gap-3">
       <div class="flex flex-column gap-2">
         <label for="ci" class="font-semibold">CI / NIT:</label>

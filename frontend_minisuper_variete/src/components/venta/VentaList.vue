@@ -104,6 +104,7 @@ defineExpose({ obtenerLista })
           v-model="estado"
           :options="estados"
           optionLabel="label"
+          appendTo="self"
           optionValue="value"
           @change="obtenerLista"
         />
@@ -130,7 +131,6 @@ defineExpose({ obtenerLista })
       </thead>
       <tbody>
         <tr v-for="v in ventasFiltradas" :key="v.id">
-          <td>{{ v.transaccion }}</td>
           <td>{{ formatoFecha(v.fechaCreacion) }}</td>
           <td>{{ v.cliente?.nombres }}</td>
           <td>{{ v.usuario?.usuario }}</td>
@@ -140,6 +140,7 @@ defineExpose({ obtenerLista })
             <Tag
               :value="v.estado === 'activa' ? 'Activa' : 'Anulada'"
               :severity="v.estado === 'activa' ? 'success' : 'danger'"
+              
             />
           </td>
           <td>
