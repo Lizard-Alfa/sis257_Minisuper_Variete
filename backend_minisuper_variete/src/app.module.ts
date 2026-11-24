@@ -11,6 +11,8 @@ import { UsuariosModule } from './usuarios/usuarios.module';
 import { ClientesModule } from './clientes/clientes.module';
 import { TrabajadoresModule } from './trabajadores/trabajadores.module';
 import { VentasModule } from './ventas/ventas.module';
+import { PromocionesModule } from './promociones/promociones.module';
+import { DetallesPromocionesModule } from './detalles-promociones/detalles-promociones.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { VentasModule } from './ventas/ventas.module';
     ClientesModule,
     AuthModule,
     VentasModule,
+    PromocionesModule,
+    DetallesPromocionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

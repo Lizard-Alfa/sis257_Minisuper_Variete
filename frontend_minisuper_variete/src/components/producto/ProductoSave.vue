@@ -30,7 +30,17 @@ const dialogVisible = computed({
     if (!value) emit('close')
   },
 })
+const porcentajeDescuento = ref<number | null>(0)
+watch(
+  [() => producto.value.precio, porcentajeDescuento],
+  ([precio, stockMinimo]) => {
+    const precioBase = Number(precio) || 0
+    const porcentaje = Number(stockMinimo) || 0
 
+    producto.value.precioDescuento = precioBase - (precioBase * porcentaje) / 100
+  },
+  { immediate: true },
+)
 const unidadesMedida = [
   { label: 'Unidad', value: 'Unidad' },
   { label: 'Kilogramo (kg)', value: 'kg' },
@@ -70,26 +80,14 @@ watch(
   },
 )
 
-const porcentajeDescuento = ref<number | null>(0)
-watch(
-  [() => producto.value.precio, porcentajeDescuento],
-  ([precio, stockMinimo]) => {
-    const precioBase = Number(precio) || 0
-    const porcentaje = Number(stockMinimo) || 0
-
-    producto.value.precioDescuento = precioBase - (precioBase * porcentaje) / 100
-  },
-  { immediate: true },
-)
-
 async function handleSave() {
   try {
     const body = {
-      codigo: producto.value.codigo,
-      nombre: producto.value.nombre,
-      idCategoria: producto.value.categoria.id,
-      idProveedor: producto.value.proveedor.id,
-      imagen: producto.value.imagen,
+      codigo: producto.value.codigo ?? '',
+      nombre: producto.value.nombre ?? '',
+      idCategoria: producto.value.categoria.id || null,
+      idProveedor: producto.value.proveedor.id || null,
+      imagen: producto.value.imagen ?? '',
       unidadMedida: producto.value.unidadMedida,
       stock: Number(producto.value.stock) || 0,
       stockMinimo: Number(producto.value.stockMinimo) || 0,
@@ -131,14 +129,14 @@ async function handleSave() {
               v-model="producto.codigo"
               maxlength="20"
               autofocus
-              oninput="this.value = this.value.toUpperCase();"
+              oninput="this.value = this.value.toUpperCase()"
               :maxlength="10"
               autocomplete="off"
             />
           </div>
           <div class="flex flex-column gap-2 flex-2">
             <label for="nombre" class="font-semibold">Nombre *</label>
-            <InputText id="nombre" v-model="producto.nombre" maxlength="100" :maxlength="100" autocomplete="off" />
+            <InputText id="nombre" v-model="producto.nombre" :maxlength="100" autocomplete="off" />
           </div>
         </div>
 

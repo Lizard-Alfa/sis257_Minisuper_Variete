@@ -52,7 +52,7 @@ function isActive(path: string): boolean {
 
         <!-- Menú colapsable -->
         <div :class="['collapse navbar-collapse', { show: menuOpen }]" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto">
+          <ul class="navbar-nav mr-auto">
             <!-- Enlaces públicos -->
             <li class="nav-item" :class="{ active: isActive('/') }">
               <RouterLink to="/" class="nav-link" @click="closeMenu">Inicio</RouterLink>
@@ -131,5 +131,14 @@ function isActive(path: string): boolean {
     margin-top: 10px;
     margin-left: 0 !important;
   }
+}
+.navbar-collapse .navbar-nav,
+.navbar-nav {
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  justify-content: flex-start !important;
+}
+.navbar-collapse {
+  justify-content: flex-start !important;
 }
 </style>

@@ -9,7 +9,7 @@ import { Producto } from '../productos/entities/producto.entity';
 import { Cliente } from '../clientes/entities/cliente.entity';
 import { Usuario } from '../usuarios/entities/usuario.entity';
 
-const CLIENTE_GENERICO_ID = 3;
+const CLIENTE_GENERICO_ID = 2;
 
 const redondear = (n: number): number => Math.round(n * 100) / 100;
 
@@ -29,7 +29,7 @@ export class VentasService {
   async create(dto: CreateVentaDto, idUsuario: number): Promise<Venta> {
     const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' });
 
-    return this.dataSource.transaction(async (manager) => {
+    return this.dataSource.transaction(async manager => {
       // 1. Cliente (genérico si no viene)
       const idCliente = dto.idCliente ?? CLIENTE_GENERICO_ID;
       const cliente = await manager.findOneBy(Cliente, { id: idCliente });
@@ -86,7 +86,13 @@ export class VentasService {
         const subtotal = redondear(precioUnitario * cantidad);
 
         total += subtotal;
-        detalles.push({ idProducto: producto.id, cantidad, precioUnitario, descuentoMonto, subtotal });
+        detalles.push({
+          idProducto: producto.id,
+          cantidad,
+          precioUnitario,
+          descuentoMonto,
+          subtotal,
+        });
 
         // 5. Descontar stock
         producto.stock -= cantidad;
@@ -115,7 +121,7 @@ export class VentasService {
 
       // 8. Guardar detalles
       await manager.save(
-        detalles.map((d) => manager.create(VentaDetalle, { ...d, idVenta: venta.id })),
+        detalles.map(d => manager.create(VentaDetalle, { ...d, idVenta: venta.id })),
       );
 
       // 9. Devolver la venta completa
@@ -128,31 +134,12 @@ export class VentasService {
     });
   }
 
-  async findAll(desde?: string, hasta?: string, estado?: string): Promise<Venta[]> {
-    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' });
-    const fechaDesde = desde ?? hoy;
-    const fechaHasta = hasta ?? fechaDesde;
-
-    const formato = /^\d{4}-\d{2}-\d{2}$/;
-    if (!formato.test(fechaDesde) || !formato.test(fechaHasta)) {
-      throw new BadRequestException('Las fechas deben tener el formato AAAA-MM-DD');
-    }
-    if (estado && !['activa', 'anulada'].includes(estado)) {
-      throw new BadRequestException('El estado debe ser activa o anulada');
-    }
-
-    const inicio = new Date(`${fechaDesde}T00:00:00.000-04:00`);
-    const fin = new Date(`${fechaHasta}T23:59:59.999-04:00`);
-
-    const ventas = await this.ventasRepository.find({
-      where: {
-        fechaCreacion: Between(inicio, fin),
-        ...(estado ? { estado } : {}),
-      },
-      relations: { cliente: true, usuario: true },
-      order: { fechaCreacion: 'DESC' },
+  async findAll(): Promise<Venta[]> {
+    return this.ventasRepository.find({
+      relations: { cliente: true, usuario: true, detalles: { producto: true } },
+      withDeleted: true,
+      order: { id: 'DESC' },
     });
-    return ventas.map(limpiar);
   }
 
   async findOne(id: number): Promise<Venta> {
@@ -166,7 +153,7 @@ export class VentasService {
   }
 
   async anular(id: number): Promise<Venta> {
-    await this.dataSource.transaction(async (manager) => {
+    await this.dataSource.transaction(async manager => {
       const venta = await manager.findOne(Venta, {
         where: { id },
         lock: { mode: 'pessimistic_write' },

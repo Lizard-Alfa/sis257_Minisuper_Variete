@@ -39,7 +39,7 @@ export class CreateProductoDto {
 
   @ApiProperty()
   @IsString({ message: 'La imagen debe ser de tipo cadena' })
-  @MaxLength(500, { message: 'El nombre no puede tener más de 500 caracteres' })
+  @MaxLength(500, { message: 'La imagen no puede tener más de 500 caracteres' })
   @Transform(({ value }): string | undefined => (typeof value == 'string' ? value.trim() : value))
   readonly imagen: string;
 

@@ -17,13 +17,13 @@
             <ul>
               <li>
                 <a href="tel:+59164410001">
-                  <i class="fa fa-phone" aria-hidden="true"></i>
+                  <i class="pi pi-phone" aria-hidden="true"></i>
                   <span class="padding_left_10">+591 6441 0001</span>
                 </a>
               </li>
               <li>
                 <a href="mailto:contacto@variete.com">
-                  <i class="fa fa-envelope" aria-hidden="true"></i>
+                  <i class="pi pi-envelope" aria-hidden="true"></i>
                   <span class="padding_left_10">contacto@variete.com</span>
                 </a>
               </li>

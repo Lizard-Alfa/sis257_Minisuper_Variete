@@ -246,6 +246,10 @@ onMounted(cargarDatos)
             <span v-if="p.stock <= 0" class="etiqueta-agotado">Agotado</span>
           </div>
           <div class="tarjeta-nombre">{{ p.nombre }}</div>
+          <div class="tarjeta-stock">
+            <span class="stock-label">Stock: </span>
+            <span class="stock-valor">{{ p.stock }}</span>
+          </div>
           <div class="tarjeta-precio">
             <span v-if="descuentoVigente(p)" class="precio-tachado">
               Bs {{ Number(p.precio).toFixed(2) }}
@@ -310,7 +314,7 @@ onMounted(cargarDatos)
             v-model="cliente"
             :suggestions="sugerencias"
             optionLabel="nombres"
-            placeholder="Cliente general (buscar por CI o nombre)"
+            placeholder="buscar por CI o nombre"
             class="flex-auto"
             :minLength="1"
             appendTo="self"
@@ -485,5 +489,14 @@ onMounted(cargarDatos)
   .venta-layout {
     grid-template-columns: 1fr;
   }
+}
+.tarjeta-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stock-label {
+  font-weight: 600;
 }
 </style>

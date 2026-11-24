@@ -93,8 +93,6 @@ defineExpose({ obtenerLista })
         placeholder="Buscar por nombre, código, categoría o proveedor"
       />
     </InputGroup>
-
-    <div class="table-responsive">
       <table class="table table-striped table-hover align-middle tabla-productos">
         <thead class="table-dark">
           <tr>
@@ -121,7 +119,7 @@ defineExpose({ obtenerLista })
               <img
                 :src="obtenerImagen(producto)"
                 :alt="producto.nombre"
-                style="width: 60px; height: 100px; object-fit: cover; border-radius: 4px"
+                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px"
               />
             </td>
             <td>{{ producto.codigo }}</td>
@@ -156,8 +154,6 @@ defineExpose({ obtenerLista })
           </tr>
         </tbody>
       </table>
-    </div>
-
     <!-- Paginar -->
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div>

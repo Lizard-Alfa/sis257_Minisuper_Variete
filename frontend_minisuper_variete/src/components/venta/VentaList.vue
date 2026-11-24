@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import http from '@/plugins/axios'
-import { Button, Dialog, InputText, Select, Tag } from 'primevue'
+import { Button, Column, DataTable, Dialog, InputText, Select, Tag } from 'primevue'
 import type { Venta } from '@/models/venta'
 
 const ENDPOINT = 'ventas'
@@ -51,7 +51,7 @@ const totalActivas = computed(() =>
 )
 
 function formatoFecha(fecha: string): string {
-  return new Date(fecha).toLocaleString('es-BO', { timeZone: 'America/La_Paz' })
+  return fecha ? new Date(fecha).toLocaleDateString('es-BO', { timeZone: 'America/La_Paz' }) : ''
 }
 
 async function verDetalle(venta: Venta) {
@@ -116,57 +116,67 @@ defineExpose({ obtenerLista })
       <strong>Total vendido (activas): Bs {{ totalActivas.toFixed(2) }}</strong>
     </p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Transacción</th>
-          <th>Fecha</th>
-          <th>Cliente</th>
-          <th>Vendedor</th>
-          <th>Pago</th>
-          <th>Total</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="v in ventasFiltradas" :key="v.id">
-          <td>{{ formatoFecha(v.fechaCreacion) }}</td>
-          <td>{{ v.cliente?.nombres }}</td>
-          <td>{{ v.usuario?.usuario }}</td>
-          <td class="text-capitalize">{{ v.metodoPago }}</td>
-          <td>Bs {{ Number(v.total).toFixed(2) }}</td>
-          <td>
-            <Tag
-              :value="v.estado === 'activa' ? 'Activa' : 'Anulada'"
-              :severity="v.estado === 'activa' ? 'success' : 'danger'"
-              
-            />
-          </td>
-          <td>
-            <Button
-              icon="pi pi-eye"
-              label="Ver más detalle"
-              text
-              size="small"
-              @click="verDetalle(v)"
-            />
-            <Button
-              icon="pi pi-ban"
-              label="Anular"
-              text
-              size="small"
-              severity="danger"
-              :disabled="v.estado === 'anulada'"
-              @click="pedirAnular(v)"
-            />
-          </td>
-        </tr>
-        <tr v-if="ventasFiltradas.length === 0">
-          <td colspan="8">No se encontraron ventas</td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable :value="ventasFiltradas" dataKey="id" responsiveLayout="scroll">
+      <template #empty>No se encontraron ventas</template>
+
+      <Column field="fechaCreacion" header="Fecha">
+        <template #body="{ data }">
+          {{ formatoFecha(data.fechaCreacion) }}
+        </template>
+      </Column>
+
+      <Column field="cliente.nombres" header="Cliente">
+        <template #body="{ data }">
+          {{ data.cliente?.nombres }}
+        </template>
+      </Column>
+
+      <Column field="usuario.usuario" header="Vendedor">
+        <template #body="{ data }">
+          {{ data.usuario?.usuario }}
+        </template>
+      </Column>
+
+      <Column field="metodoPago" header="Pago">
+        <template #body="{ data }">
+          <span class="text-capitalize">{{ data.metodoPago }}</span>
+        </template>
+      </Column>
+
+      <Column field="total" header="Total">
+        <template #body="{ data }"> Bs {{ Number(data.total).toFixed(2) }} </template>
+      </Column>
+
+      <Column field="estado" header="Estado">
+        <template #body="{ data }">
+          <Tag
+            :value="data.estado === 'activa' ? 'Activa' : 'Anulada'"
+            :severity="data.estado === 'activa' ? 'success' : 'danger'"
+          />
+        </template>
+      </Column>
+
+      <Column header="Acciones">
+        <template #body="{ data }">
+          <Button
+            icon="pi pi-eye"
+            label="Ver más detalle"
+            text
+            size="small"
+            @click="verDetalle(data)"
+          />
+          <Button
+            icon="pi pi-ban"
+            label="Anular"
+            text
+            size="small"
+            severity="danger"
+            :disabled="data.estado === 'anulada'"
+            @click="pedirAnular(data)"
+          />
+        </template>
+      </Column>
+    </DataTable>
 
     <!-- Modal de detalle -->
     <Dialog

@@ -17,15 +17,8 @@ export class VentasController {
   }
 
   @Get()
-  @ApiQuery({ name: 'desde', required: false, example: '2026-11-18' })
-  @ApiQuery({ name: 'hasta', required: false, example: '2026-11-18' })
-  @ApiQuery({ name: 'estado', required: false, enum: ['activa', 'anulada'] })
-  findAll(
-    @Query('desde') desde?: string,
-    @Query('hasta') hasta?: string,
-    @Query('estado') estado?: string,
-  ) {
-    return this.ventasService.findAll(desde, hasta, estado);
+  findAll() {
+    return this.ventasService.findAll();
   }
 
   @Get(':id')
