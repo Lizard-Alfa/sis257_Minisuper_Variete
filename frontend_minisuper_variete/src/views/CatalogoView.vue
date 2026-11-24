@@ -34,10 +34,13 @@ const placeholderImg = 'https://via.placeholder.com/300x200?text=Sin+Imagen'
 
 <template>
   <div class="catalogo">
-    <div class="banner-item-01 text-center py-5 text-white" style="background: linear-gradient(135deg, #1a6692 0%, #121212 100%);">
+    <div
+      class="banner-item-01 text-center py-5 text-white"
+      style="background: linear-gradient(135deg, #1a6692 0%, #121212 100%)"
+    >
       <div class="container py-5">
-        <h4 class="text-uppercase" style="color: #f33f3f;">Bienvenido a</h4>
-        <h2 class="text-uppercase" style="letter-spacing: 5px;">Minisúper Variete</h2>
+        <h4 class="text-uppercase" style="color: #f33f3f">Bienvenido a</h4>
+        <h2 class="text-uppercase" style="letter-spacing: 5px">Minisúper Variete</h2>
         <p class="mt-3">Los mejores productos al mejor precio</p>
       </div>
     </div>
@@ -92,7 +95,7 @@ const placeholderImg = 'https://via.placeholder.com/300x200?text=Sin+Imagen'
   transition: all 0.3s;
 }
 .product-item:hover {
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 .product-item img {
   width: 100%;

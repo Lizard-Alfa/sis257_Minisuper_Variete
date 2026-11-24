@@ -1,15 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Req,
+  ParseIntPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { PromocionesService } from './promociones.service';
-import { CreatePromocioneDto } from './dto/create-promocione.dto';
-import { UpdatePromocioneDto } from './dto/update-promocione.dto';
+//import { UpdatePromocioneDto } from './dto/update-promocione.dto';
+import { CreatePromocionDto } from './dto/create-promocion.dto';
+import { Usuario } from '../usuarios/entities/usuario.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('promociones')
 export class PromocionesController {
   constructor(private readonly promocionesService: PromocionesService) {}
 
   @Post()
-  create(@Body() createPromocioneDto: CreatePromocioneDto) {
-    return this.promocionesService.create(createPromocioneDto);
+  create(@Body() createPromocionDto: CreatePromocionDto, @Req() req: { user: Usuario }) {
+    return this.promocionesService.create(createPromocionDto, req.user.id);
   }
 
   @Get()
@@ -18,17 +33,17 @@ export class PromocionesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.promocionesService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.promocionesService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePromocioneDto: UpdatePromocioneDto) {
-    return this.promocionesService.update(+id, updatePromocioneDto);
+  @Patch(':id/cancelar')
+  cancelar(@Param('id', ParseIntPipe) id: number) {
+    return this.promocionesService.cancelar(id);
   }
 
-  @Delete(':id')
+  /*@Delete(':id')
   remove(@Param('id') id: string) {
     return this.promocionesService.remove(+id);
-  }
+  }*/
 }

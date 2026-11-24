@@ -5,11 +5,13 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { compare, genSalt, hash } from 'bcryptjs';
+import { Promocion } from '../../promociones/entities/promocion.entity';
 
 @Entity('usuarios')
 export class Usuario {
@@ -49,4 +51,6 @@ export class Usuario {
   async validatePassword(plainPassword: string): Promise<boolean> {
     return compare(plainPassword, this.clave);
   }
+  @OneToMany(() => Promocion, promociones => promociones.usuario)
+  promociones: Promocion[];
 }

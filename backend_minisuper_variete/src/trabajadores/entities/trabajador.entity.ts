@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-
 @Entity('trabajadores')
 export class Trabajador {
   @PrimaryGeneratedColumn('identity')
@@ -38,5 +37,4 @@ export class Trabajador {
 
   @DeleteDateColumn({ name: 'fecha_eliminacion' })
   fechaEliminacion: Date;
-
 }

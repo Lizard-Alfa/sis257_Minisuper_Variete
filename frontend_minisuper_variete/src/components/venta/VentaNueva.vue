@@ -307,7 +307,7 @@ onMounted(cargarDatos)
           <span>Bs {{ total.toFixed(2) }}</span>
         </div>
       </div>
-
+<!-- 320 se hizo la correccion del select -->
       <div class="flex flex-column gap-2 mt-3">
         <div class="flex gap-2">
           <AutoComplete

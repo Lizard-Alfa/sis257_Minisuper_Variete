@@ -153,6 +153,7 @@ async function handleSave() {
               appendTo="self"
             />
           </div>
+          <!-- 167 se hizo la correccion del select -->
           <div class="flex flex-column gap-2 flex-1">
             <label for="proveedor" class="font-semibold">Proveedor (opcional)</label>
             <Select
@@ -163,7 +164,7 @@ async function handleSave() {
               optionValue="id"
               placeholder="Seleccione un proveedor"
               class="w-full"
-              appendTo="self"
+              appendTo="self"  
             />
           </div>
         </div>

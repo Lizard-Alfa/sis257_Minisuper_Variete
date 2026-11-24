@@ -76,7 +76,7 @@ function isActive(path: string): boolean {
               <li class="nav-item" :class="{ active: isActive('/clientes') }">
                 <RouterLink to="/clientes" class="nav-link" @click="closeMenu">Clientes</RouterLink>
               </li>
-              <li class="nav-item" :class="{ active: isActive('/ventas') }">
+              <li class="nav-item" :class="{ active: isActive('/ventas/nueva') }">
                 <RouterLink to="/ventas/nueva" class="nav-link text-nowrap" @click="closeMenu"
                   >Venta</RouterLink
                 >
@@ -84,6 +84,11 @@ function isActive(path: string): boolean {
               <li class="nav-item" :class="{ active: isActive('/ventas') }">
                 <RouterLink to="/ventas" class="nav-link text-nowrap" @click="closeMenu"
                   >Historial</RouterLink
+                >
+              </li>
+              <li class="nav-item" :class="{ active: isActive('/promociones') }">
+                <RouterLink to="/promociones" class="nav-link text-nowrap" @click="closeMenu"
+                  >Promociones</RouterLink
                 >
               </li>
             </template>

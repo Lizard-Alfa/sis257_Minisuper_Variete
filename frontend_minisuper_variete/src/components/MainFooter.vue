@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 <template>
   <!-- footer section start -->
   <div class="footer_section layout_padding">
@@ -8,9 +7,21 @@
         <div class="col-md-12">
           <div class="footer_social_icon">
             <ul>
-              <li><a href="#" aria-label="Facebook"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
-              <li><a href="#" aria-label="Twitter"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
-              <li><a href="#" aria-label="Instagram"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+              <li>
+                <a href="#" aria-label="Facebook"
+                  ><i class="fa fa-facebook" aria-hidden="true"></i
+                ></a>
+              </li>
+              <li>
+                <a href="#" aria-label="Twitter"
+                  ><i class="fa fa-twitter" aria-hidden="true"></i
+                ></a>
+              </li>
+              <li>
+                <a href="#" aria-label="Instagram"
+                  ><i class="fa fa-instagram" aria-hidden="true"></i
+                ></a>
+              </li>
             </ul>
           </div>
           <div class="location_text">
@@ -40,9 +51,7 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-12">
-          <p class="copyright_text">
-            © 2026 Minisúper Variété. Todos los derechos reservados.
-          </p>
+          <p class="copyright_text">© 2026 Minisúper Variété. Todos los derechos reservados.</p>
         </div>
       </div>
     </div>

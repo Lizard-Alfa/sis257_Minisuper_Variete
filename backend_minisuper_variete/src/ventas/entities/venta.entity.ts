@@ -55,6 +55,6 @@ export class Venta {
   @JoinColumn({ name: 'id_cliente', referencedColumnName: 'id' })
   cliente: Cliente;
 
-  @OneToMany(() => VentaDetalle, (detalle) => detalle.venta)
+  @OneToMany(() => VentaDetalle, detalle => detalle.venta)
   detalles: VentaDetalle[];
 }

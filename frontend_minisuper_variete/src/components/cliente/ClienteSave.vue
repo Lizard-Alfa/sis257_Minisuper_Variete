@@ -74,11 +74,10 @@ async function guardar() {
     "
     @hide="emit('close')"
   >
-    
     <div class="flex flex-column gap-3">
       <div class="flex flex-column gap-2">
         <label for="ci" class="font-semibold">CI / NIT:</label>
-        <InputText id="ci" v-model="form.nitCi" autocomplete="off" type = "number" />
+        <InputText id="ci" v-model="form.nitCi" autocomplete="off" type="number" />
       </div>
 
       <div class="flex flex-column gap-2">

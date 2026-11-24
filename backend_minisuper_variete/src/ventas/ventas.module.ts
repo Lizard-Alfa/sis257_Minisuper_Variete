@@ -8,7 +8,7 @@ import { Venta } from './entities/venta.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Venta, VentaDetalle, Producto, Cliente])],
+  imports: [TypeOrmModule.forFeature([Venta, VentaDetalle, Producto, Cliente])],
   controllers: [VentasController],
   providers: [VentasService],
 })

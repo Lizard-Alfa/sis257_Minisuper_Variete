@@ -93,67 +93,62 @@ defineExpose({ obtenerLista })
         placeholder="Buscar por nombre, código, categoría o proveedor"
       />
     </InputGroup>
-      <table class="table table-striped table-hover align-middle tabla-productos">
-        <thead class="table-dark">
-          <tr>
-            <th>Nro.</th>
-            <th>Imagen</th>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-            <th>Proveedor</th>
-            <th>Unidad de Medida</th>
-            <th>Stock</th>
-            <th>Descuento(%)</th>
-            <th>Precio</th>
-            <th>Precio con descuento</th>
-            <th>Descuento Inicio</th>
-            <th>Descuento Fin</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(producto, index) in productosPaginados" :key="producto.id">
-            <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
-            <td>
-              <img
-                :src="obtenerImagen(producto)"
-                :alt="producto.nombre"
-                style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px"
-              />
-            </td>
-            <td>{{ producto.codigo }}</td>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.categoria?.nombre }}</td>
-            <td>{{ producto.proveedor?.nombres }}</td>
-            <td>{{ producto.unidadMedida }}</td>
-            <td>{{ producto.stock }}</td>
-            <td>{{ producto.stockMinimo }}</td>
-            <td>{{ producto.precio }}</td>
-            <td>{{ producto.precioDescuento }}</td>
-            <td>{{ producto.descuentoInicio }}</td>
-            <td>{{ producto.descuentoFin }}</td>
-            <td>
-              <Button
-                icon="pi pi-pencil"
-                aria-label="Editar"
-                text
-                @click="emitirEdicion(producto)"
-              />
-              <Button
-                icon="pi pi-trash"
-                aria-label="Eliminar"
-                text
-                severity="danger"
-                @click="mostrarEliminarConfirm(producto)"
-              />
-            </td>
-          </tr>
-          <tr v-if="productosPaginados.length === 0">
-            <td colspan="14" class="text-center">No se encontraron resultados</td>
-          </tr>
-        </tbody>
-      </table>
+    <table class="table table-striped table-hover align-middle tabla-productos">
+      <thead class="table-dark">
+        <tr>
+          <th>Nro.</th>
+          <th>Imagen</th>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Proveedor</th>
+          <th>Unidad de Medida</th>
+          <th>Stock</th>
+          <th>Descuento(%)</th>
+          <th>Precio</th>
+          <th>Precio con descuento</th>
+          <th>Descuento Inicio</th>
+          <th>Descuento Fin</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(producto, index) in productosPaginados" :key="producto.id">
+          <td>{{ (paginaActual - 1) * filasPorPagina + index + 1 }}</td>
+          <td>
+            <img
+              :src="obtenerImagen(producto)"
+              :alt="producto.nombre"
+              style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px"
+            />
+          </td>
+          <td>{{ producto.codigo }}</td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.categoria?.nombre }}</td>
+          <td>{{ producto.proveedor?.nombres }}</td>
+          <td>{{ producto.unidadMedida }}</td>
+          <td>{{ producto.stock }}</td>
+          <td>{{ producto.stockMinimo }}</td>
+          <td>{{ producto.precio }}</td>
+          <td>{{ producto.precioDescuento }}</td>
+          <td>{{ producto.descuentoInicio }}</td>
+          <td>{{ producto.descuentoFin }}</td>
+          <td>
+            <Button icon="pi pi-pencil" aria-label="Editar" text @click="emitirEdicion(producto)" />
+            <Button
+              icon="pi pi-trash"
+              aria-label="Eliminar"
+              text
+              severity="danger"
+              @click="mostrarEliminarConfirm(producto)"
+            />
+          </td>
+        </tr>
+        <tr v-if="productosPaginados.length === 0">
+          <td colspan="14" class="text-center">No se encontraron resultados</td>
+        </tr>
+      </tbody>
+    </table>
     <!-- Paginar -->
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div>

@@ -12,11 +12,13 @@ import { ClientesModule } from './clientes/clientes.module';
 import { TrabajadoresModule } from './trabajadores/trabajadores.module';
 import { VentasModule } from './ventas/ventas.module';
 import { PromocionesModule } from './promociones/promociones.module';
-import { DetallesPromocionesModule } from './detalles-promociones/detalles-promociones.module';
+import { ScheduleModule } from '@nestjs/schedule';
+
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -37,7 +39,6 @@ import { DetallesPromocionesModule } from './detalles-promociones/detalles-promo
     AuthModule,
     VentasModule,
     PromocionesModule,
-    DetallesPromocionesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

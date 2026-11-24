@@ -12,6 +12,7 @@ import {
 import { Categoria } from '../../categorias/entities/categoria.entity';
 import { Proveedor } from '../../proveedores/entities/proveedor.entity';
 import { VentaDetalle } from '../../ventas/entities/venta-detalle.entity';
+import { DetallePromo } from '../../promociones/entities/detalle-promo.entity';
 
 @Entity('productos')
 export class Producto {
@@ -70,6 +71,10 @@ export class Producto {
   @ManyToOne(() => Proveedor, proveedor => proveedor.productos)
   @JoinColumn({ name: 'id_proveedor', referencedColumnName: 'id' })
   proveedor: Proveedor;
+
   @OneToMany(() => VentaDetalle, detalle => detalle.producto)
   ventaDetalles: VentaDetalle[];
+  
+  @OneToMany(() => DetallePromo, promodetalles => promodetalles.producto)
+  promodetalles: DetallePromo[];
 }

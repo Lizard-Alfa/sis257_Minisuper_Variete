@@ -1060,7 +1060,7 @@ textarea#comment.update_mail::placeholder {
 .margin_top90 {
   margin-top: 90px;
 }
-/* se agrego esto para corregir */ 
+/* se agrego esto para corregir el parpadeo*/
 .p-dialog-mask,
 .p-dialog,
 .p-dialog-enter-active,

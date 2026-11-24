@@ -12,7 +12,6 @@ import {
 } from 'class-validator';
 
 export class CreateUsuarioDto {
-
   @ApiProperty()
   @IsNotEmpty({ message: 'El usuario es obligatorio' })
   @IsString({ message: 'El usuario debe ser de tipo cadena' })

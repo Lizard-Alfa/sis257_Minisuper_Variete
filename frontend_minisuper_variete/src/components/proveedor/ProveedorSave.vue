@@ -137,17 +137,29 @@ async function handleSave() {
       <div class="flex flex-column gap-3">
         <div class="flex flex-column gap-2">
           <label for="nitCi" class="font-semibold">NIT / CI *</label>
-          <InputText id="nitCi" v-model="form.nitCi" maxlength="20" autocomplete="off" type="number" autofocus />
+          <InputText
+            id="nitCi"
+            v-model="form.nitCi"
+            maxlength="20"
+            autocomplete="off"
+            type="number"
+            autofocus
+          />
         </div>
 
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="nombres" class="font-semibold">Nombres *</label>
-            <InputText id="nombres" v-model="form.nombres" maxlength="50"  autocomplete="off" />
+            <InputText id="nombres" v-model="form.nombres" maxlength="50" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
             <label for="razonSocial" class="font-semibold">Razon solial </label>
-            <InputText id="razonSocial" v-model="form.razonSocial" maxlength="50" autocomplete="off" />
+            <InputText
+              id="razonSocial"
+              v-model="form.razonSocial"
+              maxlength="50"
+              autocomplete="off"
+            />
           </div>
         </div>
 
