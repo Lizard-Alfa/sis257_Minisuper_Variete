@@ -6,24 +6,34 @@ import { CreateVentaDto } from './dto/create-venta.dto';
 import { Venta } from './entities/venta.entity';
 import { VentaDetalle } from './entities/venta-detalle.entity';
 import { Producto } from '../productos/entities/producto.entity';
-<<<<<<< HEAD
+import { Cliente } from '../clientes/entities/cliente.entity';
+import { Usuario } from '../usuarios/entities/usuario.entity';
 
-const redondear = (n: number) => Math.round(n * 100) / 100;
+const CLIENTE_GENERICO_ID = 2;
+
+const redondear = (n: number): number => Math.round(n * 100) / 100;
+
+// Evita que se filtre el hash de la clave del usuario
+const limpiar = (v: Venta): Venta => {
+  if (v.usuario) v.usuario = { id: v.usuario.id, usuario: v.usuario.usuario } as Usuario;
+  return v;
+};
 
 @Injectable()
 export class VentasService {
   constructor(
     @InjectDataSource() private readonly dataSource: DataSource,
-    @InjectRepository(Venta) private readonly ventasRepo: Repository<Venta>,
+    @InjectRepository(Venta) private readonly ventasRepository: Repository<Venta>,
   ) {}
 
   async create(dto: CreateVentaDto, idUsuario: number): Promise<Venta> {
-    return this.dataSource.transaction(async (manager) => {
-      // 1. Determinar cliente
-      const esOcasional = !dto.clienteCi || dto.clienteCi === '0' || dto.clienteCi === 'S/N';
-      const clienteCi = esOcasional ? '0' : dto.clienteCi;
-      const clienteNombre = esOcasional ? 'Cliente Ocasional' : dto.clienteNombre || 'Cliente Ocasional';
-      const tipoCliente = esOcasional ? 'ocasional' : 'regular';
+    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' });
+
+    return this.dataSource.transaction(async manager => {
+      // 1. Cliente (genérico si no viene)
+      const idCliente = dto.idCliente ?? CLIENTE_GENERICO_ID;
+      const cliente = await manager.findOneBy(Cliente, { id: idCliente });
+      if (!cliente) throw new NotFoundException('El cliente no existe');
 
       // 2. Unir productos repetidos
       const cantidades = new Map<number, number>();
@@ -31,116 +41,22 @@ export class VentasService {
         cantidades.set(d.idProducto, (cantidades.get(d.idProducto) ?? 0) + d.cantidad);
       }
 
-      // 3. Traer productos
+      // 3. Traer productos bloqueados
       const productos = await manager.find(Producto, {
         where: { id: In([...cantidades.keys()]) },
         order: { id: 'ASC' },
         lock: { mode: 'pessimistic_write' },
       });
-
-=======
-import { Cliente } from '../clientes/entities/cliente.entity';
-
-
-// ⚠️ Cambia este valor por el id real de tu "Cliente general"
-const CLIENTE_GENERICO_ID = 3;
-
-const redondear = (n: number): number => Math.round(n * 100) / 100;
-
-@Injectable()
-export class VentasService {
- constructor(
-  @InjectDataSource() private readonly dataSource: DataSource,
-  @InjectRepository(Venta) private readonly ventasRepository: Repository<Venta>,
-) {}
-
-  async create(dto: CreateVentaDto, idTrabajador: number): Promise<Venta> {
-    // Fecha de hoy en Bolivia (YYYY-MM-DD) para comparar con las fechas de descuento
-    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' });
-
-    return this.dataSource.transaction(async (manager) => {
-      // 1. Cliente (genérico si no viene)
-      const idCliente = dto.idCliente ?? CLIENTE_GENERICO_ID;
-      const cliente = await manager.findOneBy(Cliente, { id: idCliente });
-      if (!cliente) throw new NotFoundException('El cliente no existe');
-
-      // 2. Unir productos repetidos (si el mismo id llega dos veces, se suman)
-      const cantidades = new Map<number, number>();
-      for (const d of dto.detalles) {
-        cantidades.set(d.idProducto, (cantidades.get(d.idProducto) ?? 0) + d.cantidad);
-      }
-
-      // 3. Traer productos bloqueados (evita que dos ventas simultáneas descuenten mal el stock)
-      const productos = await manager.find(Producto, {
-        where: { id: In([...cantidades.keys()]) },
-        order: { id: 'ASC' },
-        lock: { mode: 'pessimistic_write' },
-      });
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
       if (productos.length !== cantidades.size) {
         throw new NotFoundException('Uno o más productos no existen');
       }
 
-<<<<<<< HEAD
-      // 4. Validar stock y calcular totales
-      let subtotal = 0;
-=======
       // 4. Validar stock y calcular precios
       let total = 0;
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
       const detalles: Partial<VentaDetalle>[] = [];
 
       for (const producto of productos) {
         const cantidad = cantidades.get(producto.id)!;
-<<<<<<< HEAD
-        if (producto.stock < cantidad) {
-          throw new BadRequestException(`Stock insuficiente para ${producto.nombre}`);
-        }
-
-        const precioUnitario = Number(producto.precio);
-        const subtotalDetalle = redondear(precioUnitario * cantidad);
-        subtotal += subtotalDetalle;
-
-        detalles.push({
-          idProducto: producto.id,
-          cantidad,
-          precioUnitario,
-          subtotal: subtotalDetalle,
-        });
-
-        producto.stock -= cantidad;
-      }
-
-      await manager.save(productos);
-
-      // 5. Calcular IVA y total
-      subtotal = redondear(subtotal);
-      const iva = redondear(subtotal * 0.13);
-      const total = redondear(subtotal + iva);
-      const montoPagado = dto.montoPagado ? Number(dto.montoPagado) : total;
-
-      if (montoPagado < total) {
-        throw new BadRequestException('Monto pagado insuficiente');
-      }
-
-      const cambio = redondear(montoPagado - total);
-
-      // 6. Guardar venta
-      const venta = await manager.save(
-        manager.create(Venta, {
-          transaccion: randomUUID().slice(0, 15),
-          idUsuario,
-          clienteCi,
-          clienteNombre,
-          tipoCliente,
-          metodoPago: dto.metodoPago || 'efectivo',
-          subtotal,
-          iva,
-          total,
-          montoPagado,
-          cambio,
-          observaciones: dto.observaciones ?? null,
-=======
 
         if (producto.stock < cantidad) {
           throw new BadRequestException(
@@ -150,18 +66,33 @@ export class VentasService {
 
         const precioNormal = Number(producto.precio);
         const precioDesc = Number(producto.precioDescuento);
-        const inicio = producto.descuentoInicio ? String(producto.descuentoInicio).slice(0, 10) : null;
+        const inicio = producto.descuentoInicio
+          ? String(producto.descuentoInicio).slice(0, 10)
+          : null;
         const fin = producto.descuentoFin ? String(producto.descuentoFin).slice(0, 10) : null;
 
         const descuentoVigente =
-          precioDesc > 0 && precioDesc < precioNormal && inicio !== null && fin !== null && inicio <= hoy && hoy <= fin;
+          precioDesc > 0 &&
+          precioDesc < precioNormal &&
+          inicio !== null &&
+          fin !== null &&
+          inicio <= hoy &&
+          hoy <= fin;
 
         const precioUnitario = descuentoVigente ? precioDesc : precioNormal;
-        const descuentoMonto = descuentoVigente ? redondear((precioNormal - precioDesc) * cantidad) : 0;
+        const descuentoMonto = descuentoVigente
+          ? redondear((precioNormal - precioDesc) * cantidad)
+          : 0;
         const subtotal = redondear(precioUnitario * cantidad);
 
         total += subtotal;
-        detalles.push({ idProducto: producto.id, cantidad, precioUnitario, descuentoMonto, subtotal });
+        detalles.push({
+          idProducto: producto.id,
+          cantidad,
+          precioUnitario,
+          descuentoMonto,
+          subtotal,
+        });
 
         // 5. Descontar stock
         producto.stock -= cantidad;
@@ -170,146 +101,78 @@ export class VentasService {
 
       total = redondear(total);
 
-      // 6. Guardar la venta (transacción temporal, se reemplaza abajo con el correlativo)
+      // 6. Guardar la venta (transacción temporal)
       const venta = await manager.save(
         manager.create(Venta, {
           transaccion: randomUUID().slice(0, 15),
-          idTrabajador,
+          idUsuario,
           idCliente,
           metodoPago: dto.metodoPago,
           observaciones: dto.observaciones ?? null,
           subtotal: total,
           total,
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
           estado: 'activa',
         }),
       );
 
-<<<<<<< HEAD
-      // 7. Número correlativo
-=======
-      // 7. Número correlativo basado en el id: V-000001
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
+      // 7. Número correlativo: V-000001
       venta.transaccion = `V-${String(venta.id).padStart(6, '0')}`;
       await manager.save(venta);
 
       // 8. Guardar detalles
       await manager.save(
-        detalles.map((d) => manager.create(VentaDetalle, { ...d, idVenta: venta.id })),
+        detalles.map(d => manager.create(VentaDetalle, { ...d, idVenta: venta.id })),
       );
 
-<<<<<<< HEAD
-      return manager.findOneOrFail(Venta, {
-        where: { id: venta.id },
-        relations: { cliente: true, usuario: true, detalles: { producto: true } },
-      });
+      // 9. Devolver la venta completa
+      return limpiar(
+        await manager.findOneOrFail(Venta, {
+          where: { id: venta.id },
+          relations: { cliente: true, usuario: true, detalles: { producto: true } },
+        }),
+      );
     });
   }
 
   async findAll(desde?: string, hasta?: string, estado?: string): Promise<Venta[]> {
-=======
-      // 9. Devolver la venta completa
-      return manager.findOneOrFail(Venta, {
-        where: { id: venta.id },
-        relations: { cliente: true, trabajador: true, detalles: { producto: true } },
-      });
-    });
-  }
-    async findAll(desde?: string, hasta?: string, estado?: string): Promise<Venta[]> {
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
-    const hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/La_Paz' });
-    const fechaDesde = desde ?? hoy;
-    const fechaHasta = hasta ?? fechaDesde;
+  const where: any = {};
 
-    const formato = /^\d{4}-\d{2}-\d{2}$/;
-    if (!formato.test(fechaDesde) || !formato.test(fechaHasta)) {
-<<<<<<< HEAD
-      throw new BadRequestException('Formato de fecha inválido (AAAA-MM-DD)');
-    }
-
-    if (estado && !['activa', 'anulada'].includes(estado)) {
-      throw new BadRequestException('Estado debe ser activa o anulada');
-    }
-
-    const inicio = new Date(`${fechaDesde}T00:00:00.000-04:00`);
-    const fin = new Date(`${fechaHasta}T23:59:59.999-04:00`);
-
-    return this.ventasRepo.find({
-      where: {
-        fechaCreacion: Between(inicio, fin),
-        ...(estado ? { estado } : {}),
-      },
-      relations: { cliente: true, usuario: true },
-      order: { fechaCreacion: 'DESC' },
-    });
+  // Filtro de fechas (ajustado para incluir todo el día "hasta")
+  if (desde && hasta) {
+    const fechaInicio = new Date(`${desde}T00:00:00`);
+    const fechaFin = new Date(`${hasta}T23:59:59`);
+    where.fechaCreacion = Between(fechaInicio, fechaFin);
+  } else if (desde) {
+    where.fechaCreacion = new Date(`${desde}T00:00:00`);
+  } else if (hasta) {
+    where.fechaCreacion = new Date(`${hasta}T23:59:59`);
   }
 
-  async findOne(id: number): Promise<Venta> {
-    const venta = await this.ventasRepo.findOne({
-      where: { id },
-      relations: { cliente: true, usuario: true, detalles: { producto: true } },
-      withDeleted: true,
-    });
-
-    if (!venta) throw new NotFoundException('Venta no existe');
-    return venta;
+  // Filtro de estado
+  if (estado) {
+    where.estado = estado;
   }
 
-  async anular(id: number): Promise<Venta> {
-    await this.dataSource.transaction(async (manager) => {
-      const venta = await manager.findOne(Venta, {
-        where: { id },
-        lock: { mode: 'pessimistic_write' },
-      });
-
-      if (!venta) throw new NotFoundException('Venta no existe');
-      if (venta.estado === 'anulada') {
-        throw new BadRequestException('Venta ya está anulada');
-      }
-
-      const detalles = await manager.find(VentaDetalle, { where: { idVenta: id } });
-      for (const d of detalles) {
-        await manager.increment(Producto, { id: d.idProducto }, 'stock', d.cantidad);
-      }
-
-      venta.estado = 'anulada';
-      await manager.save(venta);
-    });
-
-=======
-      throw new BadRequestException('Las fechas deben tener el formato AAAA-MM-DD');
-    }
-    if (estado && !['activa', 'anulada'].includes(estado)) {
-      throw new BadRequestException('El estado debe ser activa o anulada');
-    }
-
-    // Día completo en hora de Bolivia (UTC-4)
-    const inicio = new Date(`${fechaDesde}T00:00:00.000-04:00`);
-    const fin = new Date(`${fechaHasta}T23:59:59.999-04:00`);
-
-    return this.ventasRepository.find({
-      where: {
-        fechaCreacion: Between(inicio, fin),
-        ...(estado ? { estado } : {}),
-      },
-      relations: { cliente: true, trabajador: true },
-      order: { fechaCreacion: 'DESC' },
-    });
-  }
+  return this.ventasRepository.find({
+    where,
+    relations: { cliente: true, usuario: true, detalles: { producto: true } },
+    withDeleted: true,
+    order: { id: 'DESC' },
+  });
+}
 
   async findOne(id: number): Promise<Venta> {
     const venta = await this.ventasRepository.findOne({
       where: { id },
-      relations: { cliente: true, trabajador: true, detalles: { producto: true } },
-      withDeleted: true, // por si un producto vendido se eliminó después
+      relations: { cliente: true, usuario: true, detalles: { producto: true } },
+      withDeleted: true,
     });
     if (!venta) throw new NotFoundException('La venta no existe');
-    return venta;
+    return limpiar(venta);
   }
 
   async anular(id: number): Promise<Venta> {
-    await this.dataSource.transaction(async (manager) => {
-      // Bloquear la venta para que no se anule dos veces a la vez
+    await this.dataSource.transaction(async manager => {
       const venta = await manager.findOne(Venta, {
         where: { id },
         lock: { mode: 'pessimistic_write' },
@@ -319,7 +182,6 @@ export class VentasService {
         throw new BadRequestException('La venta ya está anulada');
       }
 
-      // Devolver el stock de cada producto
       const detalles = await manager.find(VentaDetalle, { where: { idVenta: id } });
       for (const d of detalles) {
         await manager.increment(Producto, { id: d.idProducto }, 'stock', d.cantidad);
@@ -329,7 +191,6 @@ export class VentasService {
       await manager.save(venta);
     });
 
->>>>>>> 59d82a3d17e1d8b5ba45c9590f2f415e1d0fa8b1
     return this.findOne(id);
   }
 }

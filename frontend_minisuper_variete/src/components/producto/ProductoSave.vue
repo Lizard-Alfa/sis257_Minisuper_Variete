@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import http from '@/plugins/axios'
-import { Button, Dialog, InputNumber, InputText, Select, DatePicker } from 'primevue'
+import { Button, Dialog, InputNumber, InputText, Select, DatePicker, Label } from 'primevue'
 import type { Producto } from '@/models/producto'
 import type { Categoria } from '@/models/categoria'
 import type { Proveedor } from '@/models/proveedor'
@@ -17,27 +17,30 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['guardar', 'close'])
-
-const producto = ref<Producto>({
-  ...(props.producto || {}),
-  categoria: props.producto?.categoria ?? { id: 0 },
-  proveedor: props.producto?.proveedor ?? { id: 0 },
-} as Producto)
-
+const producto = ref<Producto>({ ...props.producto })
 watch(
   () => props.producto,
   (newVal) => {
-    producto.value = {
-      ...(newVal || {}),
-      categoria: newVal?.categoria ?? { id: 0 },
-      proveedor: newVal?.proveedor ?? { id: 0 },
-    } as Producto
+    producto.value = { ...newVal }
   },
 )
+const dialogVisible = computed({
+  get: () => props.mostrar,
+  set: (value) => {
+    if (!value) emit('close')
+  },
+})
+const porcentajeDescuento = ref<number | null>(0)
+watch(
+  [() => producto.value.precio, porcentajeDescuento],
+  ([precio, stockMinimo]) => {
+    const precioBase = Number(precio) || 0
+    const porcentaje = Number(stockMinimo) || 0
 
-const categorias = ref<Categoria[]>([])
-const proveedores = ref<Proveedor[]>([])
-
+    producto.value.precioDescuento = precioBase - (precioBase * porcentaje) / 100
+  },
+  { immediate: true },
+)
 const unidadesMedida = [
   { label: 'Unidad', value: 'Unidad' },
   { label: 'Kilogramo (kg)', value: 'kg' },
@@ -48,6 +51,8 @@ const unidadesMedida = [
   { label: 'Caja', value: 'Caja' },
   { label: 'Paquete', value: 'Paquete' },
 ]
+const categorias = ref<Categoria[]>([])
+const proveedores = ref<Proveedor[]>([])
 
 async function obtenerCategorias() {
   categorias.value = await http.get('categorias').then((res) => res.data)
@@ -56,77 +61,43 @@ async function obtenerCategorias() {
 async function obtenerProveedores() {
   proveedores.value = await http.get('proveedores').then((res) => res.data)
 }
-
 watch(
   () => props.mostrar,
   (nuevoValor) => {
     if (nuevoValor) {
       obtenerCategorias()
       obtenerProveedores()
-
       if (props.producto?.id) {
-        producto.value = {
-          ...props.producto,
-          categoria: props.producto.categoria ?? { id: 0 },
-          proveedor: props.producto.proveedor ?? { id: 0 },
-        }
+        producto.value = { ...props.producto }
       } else {
         producto.value = {
-          id: 0,
+          stock: 0,
           categoria: { id: 0 },
           proveedor: { id: 0 },
-        } as unknown as Producto
+        } as Producto
       }
     }
   },
 )
 
-const dialogVisible = computed({
-  get: () => props.mostrar,
-  set: (value) => {
-    if (!value) emit('close')
-  },
-})
-
 async function handleSave() {
   try {
-    if (!producto.value.codigo) {
-      alert('El código es obligatorio')
-      return
-    }
-    if (!producto.value.nombre) {
-      alert('El nombre es obligatorio')
-      return
-    }
-    if (!producto.value.categoria?.id) {
-      alert('Debe seleccionar una categoría')
-      return
-    }
-    if (producto.value.precio <= 0) {
-      alert('El precio debe ser mayor a 0')
-      return
-    }
-    if (!producto.value.unidadMedida) {
-      alert('La unidad de medida es obligatoria')
-      return
-    }
-
     const body = {
-      codigo: producto.value.codigo,
-      nombre: producto.value.nombre,
-      idCategoria: producto.value.categoria?.id,
-      idProveedor: producto.value.proveedor?.id,
-      imagen: producto.value.imagen,
+      codigo: producto.value.codigo ?? '',
+      nombre: producto.value.nombre ?? '',
+      idCategoria: producto.value.categoria.id || null,
+      idProveedor: producto.value.proveedor.id || null,
+      imagen: producto.value.imagen ?? '',
       unidadMedida: producto.value.unidadMedida,
-      stock: Number(producto.value.stock),
-      stockMinimo: Number(producto.value.stockMinimo),
-      precio: Number(producto.value.precio),
-      precioDescuento: Number(producto.value.precioDescuento),
-      descuentoInicio: producto.value.descuentoInicio||null,
-      descuentoFin: producto.value.descuentoFin||null,
+      stock: Number(producto.value.stock) || 0,
+      stockMinimo: Number(producto.value.stockMinimo) || 0,
+      precio: Number(producto.value.precio) || 0,
+      precioDescuento: Number(producto.value.precioDescuento) || 0,
+      descuentoInicio: producto.value.descuentoInicio || null,
+      descuentoFin: producto.value.descuentoFin || null,
     }
 
-    if (props.modoEdicion && producto.value.id) {
+    if (props.modoEdicion) {
       await http.patch(`${ENDPOINT}/${producto.value.id}`, body)
     } else {
       await http.post(ENDPOINT, body)
@@ -146,23 +117,26 @@ async function handleSave() {
     <Dialog
       v-model:visible="dialogVisible"
       :header="props.modoEdicion ? 'Editar Producto' : 'Nuevo Producto'"
-      :style="{ width: '40rem' }"
+      style="width: 40rem"
       modal
     >
       <div class="flex flex-column gap-3">
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
-            <label for="codigo" class="font-semibold">Código *</label>
+            <Label for="codigo" class="font-semibold">Código *</Label>
             <InputText
               id="codigo"
               v-model="producto.codigo"
               maxlength="20"
+              autofocus
+              oninput="this.value = this.value.toUpperCase()"
+              :maxlength="10"
               autocomplete="off"
             />
           </div>
           <div class="flex flex-column gap-2 flex-2">
             <label for="nombre" class="font-semibold">Nombre *</label>
-            <InputText id="nombre" v-model="producto.nombre" maxlength="100" autocomplete="off" />
+            <InputText id="nombre" v-model="producto.nombre" :maxlength="100" autocomplete="off" />
           </div>
         </div>
 
@@ -175,10 +149,11 @@ async function handleSave() {
               :options="categorias"
               optionLabel="nombre"
               optionValue="id"
-              placeholder="Seleccione una categoría"
-              class="w-full"
+              placeholder="Seleccione una categoria"
+              appendTo="self"
             />
           </div>
+          <!-- 167 se hizo la correccion del select -->
           <div class="flex flex-column gap-2 flex-1">
             <label for="proveedor" class="font-semibold">Proveedor (opcional)</label>
             <Select
@@ -189,6 +164,7 @@ async function handleSave() {
               optionValue="id"
               placeholder="Seleccione un proveedor"
               class="w-full"
+              appendTo="self"  
             />
           </div>
         </div>
@@ -200,6 +176,7 @@ async function handleSave() {
             v-model="producto.imagen"
             placeholder="https://ejemplo.com/imagen.jpg"
             autocomplete="off"
+            :maxlength="500"
           />
           <small v-if="producto.imagen" class="text-color-secondary">
             Vista previa:
@@ -228,17 +205,32 @@ async function handleSave() {
             optionValue="value"
             placeholder="Seleccione una unidad"
             class="w-full"
+            :maxlength="50"
+            appendTo="self"
           />
         </div>
 
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="stock" class="font-semibold">Stock *</label>
-            <InputNumber id="stock" v-model="producto.stock" class="w-full" :min="0" />
+            <InputNumber
+              id="stock"
+              v-model="producto.stock"
+              class="w-full"
+              :min="0"
+              placeholder="0"
+            />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="stockMinimo" class="font-semibold">Stock Mínimo *</label>
-            <InputNumber id="stockMinimo" v-model="producto.stockMinimo" class="w-full" :min="0" />
+            <label for="stokMinimo" class="font-semibold"> Descuento (%) </label>
+            <InputNumber
+              id="stockMinimo"
+              v-model="porcentajeDescuento"
+              suffix="%"
+              :min="0"
+              :max="100"
+              class="w-full"
+            />
           </div>
         </div>
 
@@ -246,27 +238,26 @@ async function handleSave() {
           <div class="flex flex-column gap-2 flex-1">
             <label for="precio" class="font-semibold">Precio (Bs.) *</label>
             <InputNumber
-              id="precio"
+              inputId="precio"
               v-model="producto.precio"
-              mode="decimal"
               :minFractionDigits="2"
-              :maxFractionDigits="2"
               :min="0"
               locale="es-BO"
               class="w-full"
+              placeholder="0,00"
             />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="precioDescuento" class="font-semibold">Precio con Descuento</label>
+            <label for="precioDescuento" class="font-semibold"> Precio con Descuento </label>
             <InputNumber
               id="precioDescuento"
               v-model="producto.precioDescuento"
               mode="decimal"
               :minFractionDigits="2"
               :maxFractionDigits="2"
-              :min="0"
               locale="es-BO"
               class="w-full"
+              disabled
             />
           </div>
         </div>
@@ -281,7 +272,7 @@ async function handleSave() {
               dateFormat="yy-mm-dd"
               showIcon
               showClearButton
-              placeholder="Seleccione fecha"
+              placeholder="dd/mm/aaaa"
               class="w-full"
             />
           </div>
@@ -293,7 +284,7 @@ async function handleSave() {
               dateFormat="yy-mm-dd"
               showIcon
               showClearButton
-              placeholder="Seleccione fecha"
+              placeholder="dd/mm/aaaa"
               class="w-full"
             />
           </div>

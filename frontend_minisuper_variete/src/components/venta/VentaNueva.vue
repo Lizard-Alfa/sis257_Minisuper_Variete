@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import http from '@/plugins/axios'
-import { Button, InputNumber, InputText, Select } from 'primevue'
+import { AutoComplete, Button, InputNumber, InputText, Select } from 'primevue'
 import type { Producto } from '@/models/producto'
 import type { Categoria } from '@/models/categoria'
 import type { Cliente } from '@/models/cliente'
+import ClienteSave from '../cliente/ClienteSave.vue'
 
 interface ItemCarrito {
   producto: Producto
@@ -19,7 +20,67 @@ const busqueda = ref<string>('')
 const categoriaSeleccionada = ref<number | null>(null)
 const carrito = ref<ItemCarrito[]>([])
 
-const idCliente = ref<number | null>(null) // null = cliente general (lo resuelve el backend)
+// string mientras escribe, Cliente cuando elige, null si está vacío
+const cliente = ref<Cliente | string | null>(null)
+const sugerencias = ref<Cliente[]>([])
+const mostrarNuevoCliente = ref<boolean>(false)
+const clienteNuevo = ref<Cliente | null>(null)
+
+const clienteId = computed(() =>
+  typeof cliente.value === 'object' ? cliente.value?.id : undefined,
+)
+const textoEscrito = computed(() => (typeof cliente.value === 'string' ? cliente.value.trim() : ''))
+
+function buscarCliente(event: { query: string }) {
+  const q = event.query.trim().toLowerCase()
+
+  sugerencias.value = q
+    ? clientes.value
+        .filter((c) =>
+          [c.nitCi, c.nombres, c.apllidos].some((valor) =>
+            String(valor ?? '')
+              .toLowerCase()
+              .includes(q),
+          ),
+        )
+        .slice(0, 8)
+    : []
+}
+
+function abrirNuevoCliente() {
+  const texto = textoEscrito.value
+
+  clienteNuevo.value = {
+    id: 0,
+    nitCi: /^\d+$/.test(texto) ? texto : '',
+    nombres: /^\d+$/.test(texto) ? '' : texto,
+    apllidos: '',
+    telefono: '',
+  } as Cliente
+
+  mostrarNuevoCliente.value = true
+}
+
+function clienteGuardado(nuevo: Cliente) {
+  if (!nuevo?.id) {
+    mostrarAviso('No se pudo recuperar el cliente registrado')
+    return
+  }
+
+  const indice = clientes.value.findIndex((c) => c.id === nuevo.id)
+
+  if (indice >= 0) {
+    clientes.value[indice] = nuevo
+  } else {
+    clientes.value.push(nuevo)
+  }
+
+  cliente.value = nuevo
+  sugerencias.value = []
+  mostrarNuevoCliente.value = false
+
+  mostrarAviso('Cliente registrado y seleccionado correctamente')
+}
 const metodoPago = ref<string>('efectivo')
 const observaciones = ref<string>('')
 const recibido = ref<number | null>(null)
@@ -119,7 +180,7 @@ async function cobrar() {
   guardando.value = true
   try {
     const body = {
-      ...(idCliente.value ? { idCliente: idCliente.value } : {}),
+      idCliente: clienteId.value,
       metodoPago: metodoPago.value,
       observaciones: observaciones.value.trim() || undefined,
       detalles: carrito.value.map((i) => ({
@@ -131,7 +192,7 @@ async function cobrar() {
     mostrarAviso(`Venta ${respuesta.data.transaccion} registrada`)
 
     carrito.value = []
-    idCliente.value = null
+    cliente.value = null
     metodoPago.value = 'efectivo'
     observaciones.value = ''
     recibido.value = null
@@ -185,6 +246,10 @@ onMounted(cargarDatos)
             <span v-if="p.stock <= 0" class="etiqueta-agotado">Agotado</span>
           </div>
           <div class="tarjeta-nombre">{{ p.nombre }}</div>
+          <div class="tarjeta-stock">
+            <span class="stock-label">Stock: </span>
+            <span class="stock-valor">{{ p.stock }}</span>
+          </div>
           <div class="tarjeta-precio">
             <span v-if="descuentoVigente(p)" class="precio-tachado">
               Bs {{ Number(p.precio).toFixed(2) }}
@@ -242,22 +307,39 @@ onMounted(cargarDatos)
           <span>Bs {{ total.toFixed(2) }}</span>
         </div>
       </div>
-
+<!-- 320 se hizo la correccion del select -->
       <div class="flex flex-column gap-2 mt-3">
-        <Select
-          v-model="idCliente"
-          :options="clientes"
-          optionLabel="nombres"
-          optionValue="id"
-          placeholder="Cliente general"
-          showClear
-          filter
-        />
+        <div class="flex gap-2">
+          <AutoComplete
+            v-model="cliente"
+            :suggestions="sugerencias"
+            optionLabel="nombres"
+            placeholder="buscar por CI o nombre"
+            class="flex-auto"
+            :minLength="1"
+            appendTo="self"
+            @complete="buscarCliente"
+          >
+            <template #option="{ option }">
+              <div>
+                <strong>{{ option.nitCi }}</strong> · {{ option.nombres }} {{ option.apllidos }}
+              </div>
+            </template>
+            <template #empty>No se encontró. Usa «Nuevo» para registrarlo.</template>
+          </AutoComplete>
+          <Button
+            icon="pi pi-user-plus"
+            label="Nuevo"
+            severity="secondary"
+            @click="abrirNuevoCliente"
+          />
+        </div>
         <Select
           v-model="metodoPago"
           :options="metodosPago"
           optionLabel="label"
           optionValue="value"
+          appendTo="self"
         />
 
         <template v-if="metodoPago === 'efectivo'">
@@ -286,6 +368,13 @@ onMounted(cargarDatos)
       </div>
     </div>
   </div>
+  <ClienteSave
+    :mostrar="mostrarNuevoCliente"
+    :cliente="clienteNuevo"
+    :modoEdicion="false"
+    @guardar="clienteGuardado"
+    @close="mostrarNuevoCliente = false"
+  />
 </template>
 
 <style scoped>
@@ -400,5 +489,14 @@ onMounted(cargarDatos)
   .venta-layout {
     grid-template-columns: 1fr;
   }
+}
+.tarjeta-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stock-label {
+  font-weight: 600;
 }
 </style>

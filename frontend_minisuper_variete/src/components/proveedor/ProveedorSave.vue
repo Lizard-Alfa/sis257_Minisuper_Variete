@@ -20,7 +20,7 @@ const emit = defineEmits(['guardar', 'close'])
 const form = ref({
   nitCi: '',
   nombres: '',
-  apellidos: '',
+  razonSocial: '',
   telefono: '',
   direccion: '',
   email: '',
@@ -34,7 +34,7 @@ watch(
         form.value = {
           nitCi: props.proveedor.nitCi ?? '',
           nombres: props.proveedor.nombres ?? '',
-          apellidos: props.proveedor.razonSocial ?? '',
+          razonSocial: props.proveedor.razonSocial ?? '',
           telefono: props.proveedor.telefono ?? '',
           direccion: props.proveedor.direccion ?? '',
           email: props.proveedor.email ?? '',
@@ -50,7 +50,7 @@ function resetForm() {
   form.value = {
     nitCi: '',
     nombres: '',
-    apellidos: '',
+    razonSocial: '',
     telefono: '',
     direccion: '',
     email: '',
@@ -74,8 +74,8 @@ async function handleSave() {
       alert('Los nombres son obligatorios')
       return
     }
-    if (!form.value.apellidos?.trim()) {
-      alert('Los apellidos son obligatorios')
+    if (!form.value.razonSocial?.trim()) {
+      alert('Los razonSocial son obligatorios')
       return
     }
     if (!form.value.telefono?.trim()) {
@@ -100,7 +100,7 @@ async function handleSave() {
     const body = {
       nitCi: form.value.nitCi.trim(),
       nombres: form.value.nombres.trim(),
-      apellidos: form.value.apellidos.trim(),
+      razonSocial: form.value.razonSocial.trim(),
       telefono: form.value.telefono.trim(),
       direccion: form.value.direccion.trim(),
       email: form.value.email.trim().toLowerCase(),
@@ -142,6 +142,7 @@ async function handleSave() {
             v-model="form.nitCi"
             maxlength="20"
             autocomplete="off"
+            type="number"
             autofocus
           />
         </div>
@@ -149,18 +150,13 @@ async function handleSave() {
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
             <label for="nombres" class="font-semibold">Nombres *</label>
-            <InputText
-              id="nombres"
-              v-model="form.nombres"
-              maxlength="50"
-              autocomplete="off"
-            />
+            <InputText id="nombres" v-model="form.nombres" maxlength="50" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="apellidos" class="font-semibold">Apellidos *</label>
+            <label for="razonSocial" class="font-semibold">Razon solial </label>
             <InputText
-              id="apellidos"
-              v-model="form.apellidos"
+              id="razonSocial"
+              v-model="form.razonSocial"
               maxlength="50"
               autocomplete="off"
             />
@@ -169,16 +165,11 @@ async function handleSave() {
 
         <div class="flex gap-3">
           <div class="flex flex-column gap-2 flex-1">
-            <label for="telefono" class="font-semibold">Teléfono *</label>
-            <InputText
-              id="telefono"
-              v-model="form.telefono"
-              maxlength="20"
-              autocomplete="off"
-            />
+            <label for="telefono" class="font-semibold">Teléfono </label>
+            <InputText id="telefono" v-model="form.telefono" maxlength="20" autocomplete="off" />
           </div>
           <div class="flex flex-column gap-2 flex-1">
-            <label for="email" class="font-semibold">Email *</label>
+            <label for="email" class="font-semibold">Email </label>
             <InputText
               id="email"
               v-model="form.email"
@@ -190,13 +181,8 @@ async function handleSave() {
         </div>
 
         <div class="flex flex-column gap-2">
-          <label for="direccion" class="font-semibold">Dirección *</label>
-          <InputText
-            id="direccion"
-            v-model="form.direccion"
-            maxlength="50"
-            autocomplete="off"
-          />
+          <label for="direccion" class="font-semibold">Dirección </label>
+          <InputText id="direccion" v-model="form.direccion" maxlength="50" autocomplete="off" />
         </div>
       </div>
 

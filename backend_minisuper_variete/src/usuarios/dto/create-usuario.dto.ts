@@ -13,11 +13,6 @@ import {
 
 export class CreateUsuarioDto {
   @ApiProperty()
-  @IsDefined({ message: 'El id del trabajador  es obligatorio' })
-  @IsInt({ message: 'El id del trabajador debe ser tipo numérico' })
-  readonly idTrabajador: number;
-
-  @ApiProperty()
   @IsNotEmpty({ message: 'El usuario es obligatorio' })
   @IsString({ message: 'El usuario debe ser de tipo cadena' })
   @MaxLength(12, { message: 'El usuario no puede tener más de 12 caracteres' })

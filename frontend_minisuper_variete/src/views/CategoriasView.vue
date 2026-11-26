@@ -38,7 +38,7 @@ function handleCloseDialog() {
           <CategoriaList ref="categoriaListRef" @edit="handleEdit" />
           <CategoriaSave
             :mostrar="mostrarDialog"
-            :categoria="categoriaEdit"
+            :categorias="categoriaEdit"
             :modoEdicion="!!categoriaEdit"
             @guardar="handleSave"
             @close="handleCloseDialog"

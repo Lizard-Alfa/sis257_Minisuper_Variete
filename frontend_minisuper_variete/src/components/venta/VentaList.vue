@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import http from '@/plugins/axios'
-import { Button, Dialog, InputText, Select, Tag } from 'primevue'
+import { Button, Column, DataTable, Dialog, InputText, Select, Tag } from 'primevue'
 import type { Venta } from '@/models/venta'
 
 const ENDPOINT = 'ventas'
@@ -26,10 +26,14 @@ const anularVisible = ref<boolean>(false)
 const ventaAnular = ref<Venta | null>(null)
 const anulando = ref<boolean>(false)
 
+  //validar lista de busqueda
 async function obtenerLista() {
   try {
-    const params: Record<string, string> = { desde: desde.value, hasta: hasta.value }
+    const params: Record<string, string> = {}
+    if (desde.value) params.desde = desde.value
+    if (hasta.value) params.hasta = hasta.value
     if (estado.value) params.estado = estado.value
+
     ventas.value = await http.get(ENDPOINT, { params }).then((r) => r.data)
   } catch (error: any) {
     alert(error?.response?.data?.message || 'Error al cargar las ventas')
@@ -51,7 +55,7 @@ const totalActivas = computed(() =>
 )
 
 function formatoFecha(fecha: string): string {
-  return new Date(fecha).toLocaleString('es-BO', { timeZone: 'America/La_Paz' })
+  return fecha ? new Date(fecha).toLocaleDateString('es-BO', { timeZone: 'America/La_Paz' }) : ''
 }
 
 async function verDetalle(venta: Venta) {
@@ -91,22 +95,17 @@ defineExpose({ obtenerLista })
   <div>
     <div class="flex flex-wrap gap-2 align-items-end mb-3">
       <div class="flex flex-column">
-        <label class="text-sm">Desde</label>
-        <InputText v-model="desde" type="date" @change="obtenerLista" />
+        <label class="text-sm">Desde</label> //Limitar fecha
+        <InputText v-model="desde" type="date" :max="hoy" class="w-full" @change="obtenerLista" />
       </div>
       <div class="flex flex-column">
         <label class="text-sm">Hasta</label>
-        <InputText v-model="hasta" type="date" @change="obtenerLista" />
+        <InputText v-model="hasta" type="date" :max="hoy" class="w-full" @change="obtenerLista" />
       </div>
       <div class="flex flex-column">
         <label class="text-sm">Estado</label>
-        <Select
-          v-model="estado"
-          :options="estados"
-          optionLabel="label"
-          optionValue="value"
-          @change="obtenerLista"
-        />
+        <Select v-model="estado" :options="estados" optionLabel="label" appendTo="self" optionValue="value"
+          @change="obtenerLista" />
       </div>
       <InputText v-model="busqueda" placeholder="Buscar transacción o cliente" class="flex-auto" />
     </div>
@@ -115,83 +114,71 @@ defineExpose({ obtenerLista })
       <strong>Total vendido (activas): Bs {{ totalActivas.toFixed(2) }}</strong>
     </p>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Transacción</th>
-          <th>Fecha</th>
-          <th>Cliente</th>
-          <th>Vendedor</th>
-          <th>Pago</th>
-          <th>Total</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="v in ventasFiltradas" :key="v.id">
-          <td>{{ v.transaccion }}</td>
-          <td>{{ formatoFecha(v.fechaCreacion) }}</td>
-          <td>{{ v.cliente?.nombres }}</td>
-          <td>{{ v.trabajador?.nombres }} {{ v.trabajador?.apellidos }}</td>
-          <td class="text-capitalize">{{ v.metodoPago }}</td>
-          <td>Bs {{ Number(v.total).toFixed(2) }}</td>
-          <td>
-            <Tag
-              :value="v.estado === 'activa' ? 'Activa' : 'Anulada'"
-              :severity="v.estado === 'activa' ? 'success' : 'danger'"
-            />
-          </td>
-          <td>
-            <Button
-              icon="pi pi-eye"
-              label="Ver más detalle"
-              text
-              size="small"
-              @click="verDetalle(v)"
-            />
-            <Button
-              icon="pi pi-ban"
-              label="Anular"
-              text
-              size="small"
-              severity="danger"
-              :disabled="v.estado === 'anulada'"
-              @click="pedirAnular(v)"
-            />
-          </td>
-        </tr>
-        <tr v-if="ventasFiltradas.length === 0">
-          <td colspan="8">No se encontraron ventas</td>
-        </tr>
-      </tbody>
-    </table>
+    <DataTable :value="ventasFiltradas" dataKey="id" responsiveLayout="scroll">
+      <template #empty>No se encontraron ventas</template>
+
+      <Column field="fechaCreacion" header="Fecha">
+        <template #body="{ data }">
+          {{ formatoFecha(data.fechaCreacion) }}
+        </template>
+      </Column>
+
+      <Column field="cliente.nombres" header="Cliente">
+        <template #body="{ data }">
+          {{ data.cliente?.nombres }}
+        </template>
+      </Column>
+
+      <Column field="usuario.usuario" header="Vendedor">
+        <template #body="{ data }">
+          {{ data.usuario?.usuario }}
+        </template>
+      </Column>
+
+      <Column field="metodoPago" header="Pago">
+        <template #body="{ data }">
+          <span class="text-capitalize">{{ data.metodoPago }}</span>
+        </template>
+      </Column>
+
+      <Column field="total" header="Total">
+        <template #body="{ data }"> Bs {{ Number(data.total).toFixed(2) }} </template>
+      </Column>
+
+      <Column field="estado" header="Estado">
+        <template #body="{ data }">
+          <Tag :value="data.estado === 'activa' ? 'Activa' : 'Anulada'"
+            :severity="data.estado === 'activa' ? 'success' : 'danger'" />
+        </template>
+      </Column>
+
+      <Column header="Acciones">
+        <template #body="{ data }">
+          <Button icon="pi pi-eye" label="Ver más detalle" text size="small" @click="verDetalle(data)" />
+          <Button icon="pi pi-ban" label="Anular" text size="small" severity="danger"
+            :disabled="data.estado === 'anulada'" @click="pedirAnular(data)" />
+        </template>
+      </Column>
+    </DataTable>
 
     <!-- Modal de detalle -->
-    <Dialog
-      v-model:visible="detalleVisible"
-      :header="`Venta ${ventaDetalle?.transaccion ?? ''}`"
-      :style="{ width: '42rem' }"
-      modal
-    >
+    <Dialog v-model:visible="detalleVisible" :header="`Venta ${ventaDetalle?.transaccion ?? ''}`"
+      :style="{ width: '42rem' }" modal>
       <div v-if="ventaDetalle">
         <div class="grid mb-3">
-          <div class="col-6"><strong>Fecha:</strong> {{ formatoFecha(ventaDetalle.fechaCreacion) }}</div>
+          <div class="col-6">
+            <strong>Fecha:</strong> {{ formatoFecha(ventaDetalle.fechaCreacion) }}
+          </div>
           <div class="col-6">
             <strong>Estado:</strong>
-            <Tag
-              class="ml-2"
-              :value="ventaDetalle.estado === 'activa' ? 'Activa' : 'Anulada'"
-              :severity="ventaDetalle.estado === 'activa' ? 'success' : 'danger'"
-            />
+            <Tag class="ml-2" :value="ventaDetalle.estado === 'activa' ? 'Activa' : 'Anulada'"
+              :severity="ventaDetalle.estado === 'activa' ? 'success' : 'danger'" />
           </div>
           <div class="col-6"><strong>Cliente:</strong> {{ ventaDetalle.cliente?.nombres }}</div>
+          <div class="col-6"><strong>Vendedor:</strong> {{ ventaDetalle.usuario?.usuario }}</div>
           <div class="col-6">
-            <strong>Vendedor:</strong> {{ ventaDetalle.trabajador?.nombres }}
-            {{ ventaDetalle.trabajador?.apellidos }}
-          </div>
-          <div class="col-6">
-            <strong>Pago:</strong> <span class="text-capitalize">{{ ventaDetalle.metodoPago }}</span>
+            <strong>Pago:</strong>
+            <span class="text-capitalize">{{ ventaDetalle.metodoPago }}</span>
           </div>
           <div class="col-6" v-if="ventaDetalle.observaciones">
             <strong>Observaciones:</strong> {{ ventaDetalle.observaciones }}
@@ -226,26 +213,16 @@ defineExpose({ obtenerLista })
 
       <div class="flex justify-end gap-2 mt-3">
         <Button label="Cerrar" severity="secondary" @click="detalleVisible = false" />
-        <Button
-          v-if="ventaDetalle?.estado === 'activa'"
-          label="Anular venta"
-          icon="pi pi-ban"
-          severity="danger"
-          @click="pedirAnular(ventaDetalle!)"
-        />
+        <Button v-if="ventaDetalle?.estado === 'activa'" label="Anular venta" icon="pi pi-ban" severity="danger"
+          @click="pedirAnular(ventaDetalle!)" />
       </div>
     </Dialog>
 
     <!-- Confirmación de anulación -->
-    <Dialog
-      v-model:visible="anularVisible"
-      header="Confirmar anulación"
-      :style="{ width: '25rem' }"
-      modal
-    >
+    <Dialog v-model:visible="anularVisible" header="Confirmar anulación" :style="{ width: '25rem' }" modal>
       <p>
-        ¿Anular la venta <strong>{{ ventaAnular?.transaccion }}</strong
-        >? Se devolverá el stock de los productos. Esta acción no se puede deshacer.
+        ¿Anular la venta <strong>{{ ventaAnular?.transaccion }}</strong>? Se devolverá el stock de los productos. Esta
+        acción no se puede deshacer.
       </p>
       <div class="flex justify-end gap-2">
         <Button label="Cancelar" severity="secondary" @click="anularVisible = false" />

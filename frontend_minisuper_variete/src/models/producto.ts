@@ -1,8 +1,8 @@
-import type { Categoria } from "./categoria";
-import type { Proveedor } from "./proveedor";
+import type { Categoria } from './categoria'
+import type { Proveedor } from './proveedor'
 
 export interface Producto {
-  id: number;
+  id: number
   codigo: string
   nombre: string
   idCategoria: number
@@ -13,8 +13,8 @@ export interface Producto {
   stockMinimo: number
   precio: number
   precioDescuento: number
-  descuentoInicio: Date|null
-  descuentoFin: Date|null
-  proveedor : Proveedor
-  categoria : Categoria
+  descuentoInicio: Date | null
+  descuentoFin: Date | null
+  proveedor: Proveedor
+  categoria: Categoria
 }

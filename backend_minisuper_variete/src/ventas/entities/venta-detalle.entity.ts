@@ -25,11 +25,11 @@ export class VentaDetalle {
   @Column('decimal', { precision: 10, scale: 2 })
   subtotal: number;
 
-  @ManyToOne(() => Venta, (venta) => venta.detalles)
+  @ManyToOne(() => Venta, venta => venta.detalles)
   @JoinColumn({ name: 'id_venta', referencedColumnName: 'id' })
   venta: Venta;
 
-  @ManyToOne(() => Producto, (producto) => producto.ventaDetalles)
+  @ManyToOne(() => Producto, producto => producto.ventaDetalles)
   @JoinColumn({ name: 'id_producto', referencedColumnName: 'id' })
   producto: Producto;
 }

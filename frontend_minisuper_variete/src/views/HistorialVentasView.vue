@@ -39,7 +39,7 @@ onMounted(async () => {
 
 const ventasFiltradas = computed(() => {
   if (filtroEstado.value === 'todas') return ventas.value
-  return ventas.value.filter(v => v.estado === filtroEstado.value)
+  return ventas.value.filter((v) => v.estado === filtroEstado.value)
 })
 
 function toggleDetalles(id: number) {
@@ -48,8 +48,11 @@ function toggleDetalles(id: number) {
 
 function formatearFecha(fecha: string) {
   return new Date(fecha).toLocaleString('es-BO', {
-    day: '2-digit', month: '2-digit', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   })
 }
 </script>
@@ -88,7 +91,10 @@ function formatearFecha(fecha: string) {
                 <td>{{ formatearFecha(v.fechaVenta) }}</td>
                 <td>{{ v.clienteNombre }}</td>
                 <td>
-                  <span class="badge" :class="v.tipoCliente === 'regular' ? 'bg-primary' : 'bg-secondary'">
+                  <span
+                    class="badge"
+                    :class="v.tipoCliente === 'regular' ? 'bg-primary' : 'bg-secondary'"
+                  >
                     {{ v.tipoCliente }}
                   </span>
                 </td>
@@ -96,7 +102,10 @@ function formatearFecha(fecha: string) {
                 <td class="fw-bold">Bs. {{ v.total }}</td>
                 <td>{{ v.usuario?.usuario || '-' }}</td>
                 <td>
-                  <span class="badge" :class="v.estado === 'completada' ? 'bg-success' : 'bg-danger'">
+                  <span
+                    class="badge"
+                    :class="v.estado === 'completada' ? 'bg-success' : 'bg-danger'"
+                  >
                     {{ v.estado }}
                   </span>
                 </td>
@@ -111,7 +120,13 @@ function formatearFecha(fecha: string) {
                   <h6 class="mb-2">Productos vendidos:</h6>
                   <table class="table table-sm mb-0">
                     <thead>
-                      <tr><th>Código</th><th>Producto</th><th>Cant.</th><th>P. Unit.</th><th>Subtotal</th></tr>
+                      <tr>
+                        <th>Código</th>
+                        <th>Producto</th>
+                        <th>Cant.</th>
+                        <th>P. Unit.</th>
+                        <th>Subtotal</th>
+                      </tr>
                     </thead>
                     <tbody>
                       <tr v-for="d in v.detalles" :key="d.id">
