@@ -17,13 +17,13 @@ export class VentasController {
   }
 
   @Get()
-findAll(
-  @Query('desde') desde?: string,
-  @Query('hasta') hasta?: string,
-  @Query('estado') estado?: string,
-) {
-  return this.ventasService.findAll(desde, hasta, estado);
-}
+  findAll(
+    @Query('desde') desde?: string,
+    @Query('hasta') hasta?: string,
+    @Query('estado') estado?: string,
+  ) {
+    return this.ventasService.findAll(desde, hasta, estado);
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -78,12 +78,15 @@ async function cancelar() {
   }
 }
 
+<<<<<<< HEAD
 function formatearFecha(fecha: string): string {
   if (!fecha) return ''
   const [year, month, day] = fecha.split('-')
   return `${day}/${month}/${year}`
 }
 
+=======
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
 onMounted(() => {
   obtenerLista()
 })
@@ -95,7 +98,15 @@ defineExpose({ obtenerLista })
   <div>
     <InputGroup class="mb-3">
       <InputGroupAddon><i class="pi pi-search"></i></InputGroupAddon>
+<<<<<<< HEAD
       <InputText v-model="busqueda" type="text" placeholder="Buscar por nombre, estado o usuario" />
+=======
+      <InputText
+        v-model="busqueda"
+        type="text"
+        placeholder="Buscar por nombre, estado o usuario"
+      />
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
     </InputGroup>
 
     <table class="table table-striped table-hover align-middle">
@@ -118,6 +129,7 @@ defineExpose({ obtenerLista })
           <td>{{ promo.nombre }}</td>
           <td>{{ promo.tipo === 'global' ? 'Todos los productos' : 'Seleccionados' }}</td>
           <td>{{ Number(promo.descuento) }}%</td>
+<<<<<<< HEAD
           <td>{{ formatearFecha(promo.fechaInicio) }}</td>
           <td>{{ formatearFecha(promo.fechaFin) }}</td>
           <td>
@@ -128,6 +140,22 @@ defineExpose({ obtenerLista })
             <Button icon="pi pi-eye" aria-label="Ver productos" text @click="verDetalle(promo)" />
             <Button v-if="promo.estado === 'activo'" icon="pi pi-ban" aria-label="Cancelar" text severity="danger"
               @click="mostrarCancelarConfirm(promo)" />
+=======
+          <td>{{ promo.fechaInicio }}</td>
+          <td>{{ promo.fechaFin }}</td>
+          <td><Tag :value="promo.estado" :severity="severidad(promo.estado)" /></td>
+          <td>{{ promo.usuario?.usuario }}</td>
+          <td>
+            <Button icon="pi pi-eye" aria-label="Ver productos" text @click="verDetalle(promo)" />
+            <Button
+              v-if="promo.estado === 'activo'"
+              icon="pi pi-ban"
+              aria-label="Cancelar"
+              text
+              severity="danger"
+              @click="mostrarCancelarConfirm(promo)"
+            />
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
           </td>
         </tr>
         <tr v-if="promocionesPaginadas.length === 0">
@@ -140,8 +168,16 @@ defineExpose({ obtenerLista })
     <div class="d-flex justify-content-between align-items-center mt-3">
       <div>
         <label class="me-2">Filas por página:</label>
+<<<<<<< HEAD
         <select v-model.number="filasPorPagina" @change="cambiarFilasPorPagina"
           class="form-select form-select-sm d-inline-block w-auto">
+=======
+        <select
+          v-model.number="filasPorPagina"
+          @change="cambiarFilasPorPagina"
+          class="form-select form-select-sm d-inline-block w-auto"
+        >
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
           <option :value="5">5</option>
           <option :value="10">10</option>
           <option :value="20">20</option>
@@ -152,8 +188,17 @@ defineExpose({ obtenerLista })
           <li class="page-item" :class="{ disabled: paginaActual === 1 }">
             <button class="page-link" @click="cambiarPagina(paginaActual - 1)">Anterior</button>
           </li>
+<<<<<<< HEAD
           <li v-for="pagina in totalPaginas" :key="pagina" class="page-item"
             :class="{ active: paginaActual === pagina }">
+=======
+          <li
+            v-for="pagina in totalPaginas"
+            :key="pagina"
+            class="page-item"
+            :class="{ active: paginaActual === pagina }"
+          >
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
             <button class="page-link" @click="cambiarPagina(pagina)">{{ pagina }}</button>
           </li>
           <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
@@ -164,12 +209,29 @@ defineExpose({ obtenerLista })
     </div>
 
     <!-- Detalle: productos de la promoción -->
+<<<<<<< HEAD
     <Dialog v-model:visible="mostrarDetalle" :header="`Promoción: ${promoDetalle?.nombre ?? ''}`"
       :style="{ width: '50rem' }" modal>
       <p class="mb-2">
         <strong>{{ Number(promoDetalle?.descuento) }}%</strong> del
         {{ promoDetalle?.fechaInicio }} al {{ promoDetalle?.fechaFin }}
         <Tag class="ms-2" :value="promoDetalle?.estado" :severity="severidad(promoDetalle?.estado ?? '')" />
+=======
+    <Dialog
+      v-model:visible="mostrarDetalle"
+      :header="`Promoción: ${promoDetalle?.nombre ?? ''}`"
+      :style="{ width: '50rem' }"
+      modal
+    >
+      <p class="mb-2">
+        <strong>{{ Number(promoDetalle?.descuento) }}%</strong> del
+        {{ promoDetalle?.fechaInicio }} al {{ promoDetalle?.fechaFin }}
+        <Tag
+          class="ms-2"
+          :value="promoDetalle?.estado"
+          :severity="severidad(promoDetalle?.estado ?? '')"
+        />
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
       </p>
       <table class="table table-sm table-striped align-middle">
         <thead>
@@ -194,6 +256,7 @@ defineExpose({ obtenerLista })
     </Dialog>
 
     <!-- Confirmar cancelación -->
+<<<<<<< HEAD
     <Dialog v-model:visible="mostrarConfirmDialog" header="Confirmar Cancelación" :style="{ width: '25rem' }" modal>
       <p>
         ¿Cancelar la promoción <strong>{{ promoCancelar?.nombre }}</strong>? Dejará de aplicarse en las ventas, pero se
@@ -201,8 +264,31 @@ defineExpose({ obtenerLista })
       </p>
       <div class="flex justify-end gap-2 mt-4">
         <Button type="button" label="Volver" severity="secondary" @click="mostrarConfirmDialog = false" />
+=======
+    <Dialog
+      v-model:visible="mostrarConfirmDialog"
+      header="Confirmar Cancelación"
+      :style="{ width: '25rem' }"
+      modal
+    >
+      <p>
+        ¿Cancelar la promoción <strong>{{ promoCancelar?.nombre }}</strong
+        >? Dejará de aplicarse en las ventas, pero se conserva en el historial.
+      </p>
+      <div class="flex justify-end gap-2 mt-4">
+        <Button
+          type="button"
+          label="Volver"
+          severity="secondary"
+          @click="mostrarConfirmDialog = false"
+        />
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
         <Button type="button" label="Cancelar promoción" severity="danger" @click="cancelar" />
       </div>
     </Dialog>
   </div>
+<<<<<<< HEAD
 </template>
+=======
+</template>
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d

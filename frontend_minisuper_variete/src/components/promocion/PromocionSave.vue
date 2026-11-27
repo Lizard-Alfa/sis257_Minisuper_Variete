@@ -258,4 +258,8 @@ async function handleSave() {
 :deep(.p-inputnumber-input) {
   color: #0c0c0c !important;
 }
+<<<<<<< HEAD
 </style>
+=======
+</style>
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d

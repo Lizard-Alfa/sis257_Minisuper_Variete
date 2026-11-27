@@ -104,8 +104,19 @@ defineExpose({ obtenerLista })
       </div>
       <div class="flex flex-column">
         <label class="text-sm">Estado</label>
+<<<<<<< HEAD
         <Select v-model="estado" :options="estados" optionLabel="label" appendTo="self" optionValue="value"
           @change="obtenerLista" />
+=======
+        <Select
+          v-model="estado"
+          :options="estados"
+          optionLabel="label"
+          appendTo="self"
+          optionValue="value"
+          @change="obtenerLista"
+        />
+>>>>>>> 8338dc273ccebca4225b019dfcc2c6c767f7571d
       </div>
       <InputText v-model="busqueda" placeholder="Buscar transacción o cliente" class="flex-auto" />
     </div>
@@ -147,16 +158,31 @@ defineExpose({ obtenerLista })
 
       <Column field="estado" header="Estado">
         <template #body="{ data }">
-          <Tag :value="data.estado === 'activa' ? 'Activa' : 'Anulada'"
-            :severity="data.estado === 'activa' ? 'success' : 'danger'" />
+          <Tag
+            :value="data.estado === 'activa' ? 'Activa' : 'Anulada'"
+            :severity="data.estado === 'activa' ? 'success' : 'danger'"
+          />
         </template>
       </Column>
 
       <Column header="Acciones">
         <template #body="{ data }">
-          <Button icon="pi pi-eye" label="Ver más detalle" text size="small" @click="verDetalle(data)" />
-          <Button icon="pi pi-ban" label="Anular" text size="small" severity="danger"
-            :disabled="data.estado === 'anulada'" @click="pedirAnular(data)" />
+          <Button
+            icon="pi pi-eye"
+            label="Ver más detalle"
+            text
+            size="small"
+            @click="verDetalle(data)"
+          />
+          <Button
+            icon="pi pi-ban"
+            label="Anular"
+            text
+            size="small"
+            severity="danger"
+            :disabled="data.estado === 'anulada'"
+            @click="pedirAnular(data)"
+          />
         </template>
       </Column>
     </DataTable>
